@@ -52,6 +52,8 @@ cm = matplotlib.pyplot.get_cmap("jet")
 # Make output directory ...
 if not os.path.exists("studyBalticConcentration"):
     os.mkdir("studyBalticConcentration")
+if not os.path.exists("studyBalticConcentration/maps"):
+    os.mkdir("studyBalticConcentration/maps")
 
 # ******************************************************************************
 
@@ -59,7 +61,7 @@ if not os.path.exists("studyBalticConcentration"):
 for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
     # Deduce image name and skip if it already exists ...
     stub = fname.split("_")[-1][:-3]
-    iname = os.path.join("studyBalticConcentration", f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.png")
+    iname = os.path.join("studyBalticConcentration/maps", f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.png")
     if os.path.exists(iname):
         continue
 
