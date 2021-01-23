@@ -22,7 +22,7 @@ except:
 PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 # [px]
 
 # Define alphabet ...
-alphabet = string.printable + "©"
+alphabet = string.printable
 
 # Define character spacing ...
 sp = 12                                                                         # [px]

@@ -3,6 +3,7 @@
 # Import standard modules ...
 import glob
 import os
+import string
 
 # Import special modules ...
 try:
@@ -38,10 +39,10 @@ PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 
 # ******************************************************************************
 
 # Define alphabet ...
-alphabet = "1234567890-: "
+alphabet = string.printable
 
 # Define character spacing ...
-sp = 11                                                                         # [px]
+sp = 12                                                                         # [px]
 
 # Load alphabet ...
 chars = numpy.array(PIL.Image.open("makeAlphabet.png").convert("RGB"))
@@ -65,7 +66,7 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
 
     print(f"Making \"{iname}\" ...")
 
-    # Catch errors ...
+    # Skip if there are errors ...
     try:
         # Open NetCDF file ...
         with scipy.io.netcdf_file(fname, mode = "r") as fobj:
@@ -73,8 +74,12 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
             # from 0 to 1 ...
             lvl = 0.01 * fobj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.float32)
     except:
-        # Print warning and skip ...
-        print(" > Error loading NetCDF.")
+        print(" > Skipping, error loading NetCDF.")
+        continue
+
+    # Skip if there isn't any sea ice ...
+    if lvl.max() <= 0.0:
+        print(" > Skipping, no sea ice.")
         continue
 
     # Make image ...
@@ -93,13 +98,25 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
     # Clean up ...
     del lvl
 
-    # Add date/time overlay ...
-    for i, char in enumerate(f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]} {stub[8:10]}:{stub[10:12]}"):
-        # Find the location of this character in the alphabet ...
-        idx = alphabet.index(char)
+    # Declare overlays ...
+    overlays = [
+        "Baltic Sea - Sea Ice Concentration",
+        "Credits: E.U. Copernicus Marine Service Information",
+        "",
+        f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]} {stub[8:10]}:{stub[10:12]}",
+    ]
 
-        # Overlay this character ...
-        img[0:chars.shape[0], i * sp:(i + 1) * sp, :] = chars[:, idx * sp:(idx + 1) * sp, :]
+    # Loop over overlays ...
+    for i, overlay in enumerate(overlays):
+        # Loop over characters in overlay ...
+        for j, char in enumerate(overlay):
+            # Find the location of this character in the alphabet ...
+            idx = alphabet.index(char)
+
+            # Overlay this character ...
+            iy = 1 + i * chars.shape[0]                                         # [px]
+            ix = 1 + j * sp                                                     # [px]
+            img[iy:iy + chars.shape[0], ix:ix + sp, :] = chars[:, idx * sp:(idx + 1) * sp, :]
 
     # Save image ...
     pyguymer3.save_array_as_PNG(img, iname, ftype_req = 0)
