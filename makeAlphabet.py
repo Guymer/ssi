@@ -25,7 +25,7 @@ PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 
 alphabet = string.printable + "©"
 
 # Define character spacing ...
-sp = 11                                                                         # [px]
+sp = 12                                                                         # [px]
 
 # Create empty white image and initialize the drawing and font objects ...
 im = PIL.Image.new("RGB", (sp * len(alphabet), 20), (255, 255, 255))
