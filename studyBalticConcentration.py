@@ -65,26 +65,33 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
 
     print(f"Making \"{iname}\" ...")
 
-    # Open NetCDF file ...
-    with scipy.io.netcdf_file(fname, mode = "r") as fobj:
-        # Extract the first layer of the dataset and scale it from 0 to 1 ...
-        lvl = 0.01 * fobj.variables["ice_concentration"].data[0, :, :].astype(numpy.float32)
+    # Catch errors ...
+    try:
+        # Open NetCDF file ...
+        with scipy.io.netcdf_file(fname, mode = "r") as fobj:
+            # Extract the first layer from a copy of the dataset and scale it
+            # from 0 to 1 ...
+            lvl = 0.01 * fobj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.float32)
+    except:
+        # Print warning and skip ...
+        print(" > Error loading NetCDF.")
+        continue
 
-        # Make image ...
-        img = numpy.zeros((lvl.shape[0], lvl.shape[1], 3), dtype = numpy.uint8)
-        img[:, :, :] = 255
-        for iy in range(lvl.shape[0]):
-            for ix in range(lvl.shape[1]):
-                if lvl[iy, ix] < 0.0:
-                    img[iy, ix, :] = 255
-                else:
-                    r, g, b, a = cm(lvl[iy, ix])
-                    img[iy, ix, 0] = 255.0 * r
-                    img[iy, ix, 1] = 255.0 * g
-                    img[iy, ix, 2] = 255.0 * b
+    # Make image ...
+    img = numpy.zeros((lvl.shape[0], lvl.shape[1], 3), dtype = numpy.uint8)
+    img[:, :, :] = 255
+    for iy in range(lvl.shape[0]):
+        for ix in range(lvl.shape[1]):
+            if lvl[iy, ix] < 0.0:
+                img[iy, ix, :] = 255
+            else:
+                r, g, b, a = cm(lvl[iy, ix])
+                img[iy, ix, 0] = 255.0 * r
+                img[iy, ix, 1] = 255.0 * g
+                img[iy, ix, 2] = 255.0 * b
 
-        # Clean up ...
-        del lvl
+    # Clean up ...
+    del lvl
 
     # Add date/time overlay ...
     for i, char in enumerate(f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]} {stub[8:10]}:{stub[10:12]}"):
