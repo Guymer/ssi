@@ -38,9 +38,6 @@ PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 
 
 # ******************************************************************************
 
-# Define alphabet ...
-alphabet = string.printable
-
 # Define character spacing ...
 sp = 12                                                                         # [px]
 
@@ -55,6 +52,8 @@ cm = matplotlib.pyplot.get_cmap("jet")
 # Make output directory ...
 if not os.path.exists("studyBalticConcentration"):
     os.mkdir("studyBalticConcentration")
+
+# ******************************************************************************
 
 # Loop over NetCDF files ...
 for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
@@ -79,6 +78,9 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
 
     # Skip if there isn't any sea ice ...
     if lvl.max() <= 0.0:
+        # Clean up ...
+        del lvl
+
         print(" > Skipping, no sea ice.")
         continue
 
@@ -111,7 +113,7 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
         # Loop over characters in overlay ...
         for j, char in enumerate(overlay):
             # Find the location of this character in the alphabet ...
-            idx = alphabet.index(char)
+            idx = string.printable.index(char)
 
             # Overlay this character ...
             iy = 1 + i * chars.shape[0]                                         # [px]

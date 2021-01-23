@@ -21,19 +21,16 @@ except:
 # Configure PIL to open images up to 1 GiP ...
 PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 # [px]
 
-# Define alphabet ...
-alphabet = string.printable
-
 # Define character spacing ...
 sp = 12                                                                         # [px]
 
 # Create empty white image and initialize the drawing and font objects ...
-im = PIL.Image.new("RGB", (sp * len(alphabet), 21), (255, 255, 255))
+im = PIL.Image.new("RGB", (sp * len(string.printable), 21), (255, 255, 255))
 dw = PIL.ImageDraw.Draw(im)
 ft = PIL.ImageFont.truetype("SFNSMono.ttf", 16)
 
 # Loop over characters in the alphabet ...
-for i, char in enumerate(alphabet):
+for i, char in enumerate(string.printable):
     # Draw character ...
     dw.text((i * sp, 0), char, (0, 0, 0), font = ft)
 
