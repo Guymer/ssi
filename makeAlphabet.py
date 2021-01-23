@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# Import standard modules ...
+import string
+
 # Import special modules ...
 try:
     import PIL
@@ -19,7 +22,7 @@ except:
 PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 # [px]
 
 # Define alphabet ...
-alphabet = "1234567890-: "
+alphabet = string.printable + "©"
 
 # Define character spacing ...
 sp = 11                                                                         # [px]
