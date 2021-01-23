@@ -17,4 +17,5 @@ shellcheck.log
 
 # Hide large datasets ...
 Copernicus
+*.csv
 *.png
