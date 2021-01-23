@@ -1,0 +1,132 @@
+#!/usr/bin/env python3
+
+# Import standard modules ...
+import datetime
+import glob
+import os
+
+# Import special modules ...
+try:
+    import numpy
+except:
+    raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
+try:
+    import scipy
+    import scipy.io
+except:
+    raise Exception("\"scipy\" is not installed; run \"pip install --user scipy\"") from None
+
+# ******************************************************************************
+
+# Make output directory ...
+if not os.path.exists("studyBalticConcentration"):
+    os.mkdir("studyBalticConcentration")
+if not os.path.exists("studyBalticConcentration/histograms"):
+    os.mkdir("studyBalticConcentration/histograms")
+
+# ******************************************************************************
+
+# Loop over NetCDF files ...
+for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
+    # Deduce histogram name and skip if it already exists ...
+    stub = fname.split("_")[-1][:-3]
+    hname = os.path.join("studyBalticConcentration/histograms", f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv")
+    if os.path.exists(hname):
+        continue
+
+    print(f"Making \"{hname}\" ...")
+
+    # Skip if there are errors ...
+    try:
+        # Open NetCDF file ...
+        with scipy.io.netcdf_file(fname, mode = "r") as fobj:
+            # Extract the first layer from a copy of the dataset ...
+            lvl = fobj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.int8)
+    except:
+        print(" > Skipping, error loading NetCDF.")
+        continue
+
+    # Skip if there isn't any sea ice ...
+    if lvl.max() <= 0:
+        # Clean up ...
+        del lvl
+
+        print(" > Skipping, no sea ice.")
+        continue
+
+    # Open CSV file ...
+    with open(hname, "wt") as fobj:
+        # Write header ...
+        fobj.write("sea ice concentration [%],area [km2]\n")
+
+        # Loop over concentrations ...
+        for conc in range(101):
+            # Write data ...
+            fobj.write("{:d},{:d}\n".format(conc, (lvl == conc).sum()))
+
+    # Clean up ...
+    del lvl
+
+# ******************************************************************************
+
+print("Summarising ...")
+
+# Initialize maxima ...
+max1 = 0                                                                        # [km2]
+max2 = 0.0                                                                      # [km2]
+
+# Loop over histograms ...
+for hname in sorted(glob.glob("studyBalticConcentration/histograms/????-??-??_??-??.csv")):
+    # Load histogram ...
+    x, y = numpy.loadtxt(hname, delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True)
+
+    # Update maxima ...
+    max1 = max(max1, y[1:101].max())                                            # [km2]
+    max2 = max(max2, 0.01 * numpy.dot(x[1:101], y[1:101]))                      # [km2]
+
+# Print summary ...
+print(f"The highest non-zero occurance is {max1} km2.")
+print(f"The highest 100%-concentration equivalent occurance is {max2} km2.")
+
+# ******************************************************************************
+
+print("Saving trends ...")
+
+# Define the start of the dataset ...
+stub = datetime.date(2018, 1, 1)
+
+# Open CSV file ...
+with open("studyBalticConcentration/trends.csv", "wt") as fobj:
+    # Write header ...
+    fobj.write("date,total sea ice area [km2],100%-concentration equivalent sea ice area [km2]\n")
+
+    # Loop over all dates since the start of the dataset ...
+    while stub <= datetime.date.today():
+        # Find histograms ...
+        hnames = sorted(glob.glob(f"studyBalticConcentration/histograms/{stub.isoformat()}_??-??.csv"))
+
+        # Check what to do ...
+        if len(hnames) == 0:
+            # Write data ...
+            fobj.write(
+                "{:s},{:d},{:e}\n".format(
+                    stub.isoformat(),
+                    0,                                                          # [km2]
+                    0.0,                                                        # [km2]
+                )
+            )
+        else:
+            # Load most up-to-date histogram for the day ...
+            x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True)
+
+            # Write data ...
+            fobj.write(
+                "{:s},{:d},{:e}\n".format(
+                    stub.isoformat(),
+                    y[1:101].sum(),                                             # [km2]
+                    0.01 * numpy.dot(x[1:101], y[1:101]),                       # [km2]
+                )
+            )
+
+        # Increment date stub ...
+        stub = stub + datetime.timedelta(days = 1)
