@@ -28,7 +28,7 @@ alphabet = string.printable + "©"
 sp = 12                                                                         # [px]
 
 # Create empty white image and initialize the drawing and font objects ...
-im = PIL.Image.new("RGB", (sp * len(alphabet), 20), (255, 255, 255))
+im = PIL.Image.new("RGB", (sp * len(alphabet), 21), (255, 255, 255))
 dw = PIL.ImageDraw.Draw(im)
 ft = PIL.ImageFont.truetype("SFNSMono.ttf", 16)
 
