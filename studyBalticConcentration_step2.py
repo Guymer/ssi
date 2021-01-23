@@ -85,8 +85,8 @@ for hname in sorted(glob.glob("studyBalticConcentration/histograms/????-??-??_??
     max2 = max(max2, 0.01 * numpy.dot(x[1:101], y[1:101]))                      # [km2]
 
 # Print summary ...
-print(f"The highest non-zero occurance is {max1} km2.")
-print(f"The highest 100%-concentration equivalent occurance is {max2} km2.")
+print(f"The highest single non-zero occurrence is {max1} km2.")
+print(f"The highest 100%-concentration equivalent occurrence is {max2} km2.")
 
 # ******************************************************************************
 
