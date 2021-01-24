@@ -15,6 +15,7 @@ If you register for a free account at [Copernicus Marine Environment Monitoring 
 1. Download the entire [SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004](https://resources.marine.copernicus.eu/?option=com_csw&view=details&product_id=SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004) dataset (by running [lftp](https://lftp.yar.ru/) as outlined above)
 2. Create PNG maps of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step1.py](studyBalticConcentration_step1.py))
 3. Create CSV histograms of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step2.py](studyBalticConcentration_step2.py))
+4. Create PNG plots of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step3.py](studyBalticConcentration_step3.py))
 
 ## Output
 
