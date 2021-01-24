@@ -22,8 +22,6 @@ try:
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
-# ******************************************************************************
-
 # Configure matplotlib ...
 matplotlib.pyplot.rcParams.update({"font.size" : 6})
 
@@ -32,8 +30,6 @@ matplotlib.pyplot.rcParams.update({"font.size" : 6})
 # Make output directory ...
 if not os.path.exists("studyBalticConcentration"):
     os.mkdir("studyBalticConcentration")
-if not os.path.exists("studyBalticConcentration/frames"):
-    os.mkdir("studyBalticConcentration/frames")
 if not os.path.exists("studyBalticConcentration/plots"):
     os.mkdir("studyBalticConcentration/plots")
 
