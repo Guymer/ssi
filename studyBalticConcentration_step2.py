@@ -117,7 +117,7 @@ with open("studyBalticConcentration/trends.csv", "wt") as fobj:
             )
         else:
             # Load most up-to-date histogram for the day ...
-            x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True)
+            x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True) # [km2], [km2]
 
             # Write data ...
             fobj.write(
