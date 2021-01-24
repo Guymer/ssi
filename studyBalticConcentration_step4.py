@@ -68,3 +68,58 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
     # Clean up ...
     im0.close()
     del im0
+
+# ******************************************************************************
+
+print("Making \"studyBalticConcentration/trends.gif\" ...")
+
+# Initialize list ...
+images = []
+
+# Loop over frames ...
+for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
+    # Append image to list ...
+    images.append(PIL.Image.open(fname).convert("RGB"))
+
+# Save 25fps GIF ...
+images[0].save("studyBalticConcentration/trends.gif", save_all = True, append_images = images[1:], duration = 40, loop = 0)
+pyguymer3.optimize_image("studyBalticConcentration/trends.gif", strip = True)
+
+# Clean up ...
+for image in images:
+    image.close()
+del images
+
+# ******************************************************************************
+
+# Set widths ...
+# NOTE: By inspection, the PNG frames are 2412 wide.
+widths = [512, 1024, 2048]                                                      # [px]
+
+# Loop over widths ...
+for width in widths:
+    print("Making \"studyBalticConcentration/trends{:04d}px.gif\" ...".format(width))
+
+    # Initialize list ...
+    images = []
+
+    # Loop over frames ...
+    for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
+        # Load image ...
+        image = PIL.Image.open(fname).convert("RGB")
+
+        # Calculate height ...
+        ratio = float(image.width) / float(image.height)                        # [px/px]
+        height = round(float(width) / ratio)                                    # [px]
+
+        # Downscale the image and append it to the list ...
+        images.append(image.resize((width, height), resample = PIL.Image.LANCZOS))
+
+    # Save 25fps GIF ...
+    images[0].save("studyBalticConcentration/trends{:04d}px.gif".format(width), save_all = True, append_images = images[1:], duration = 40, loop = 0)
+    pyguymer3.optimize_image("studyBalticConcentration/trends{:04d}px.gif".format(width), strip = True)
+
+    # Clean up ...
+    for image in images:
+        image.close()
+    del images
