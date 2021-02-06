@@ -31,8 +31,8 @@ The highest 100%-concentration equivalent occurrence is 166898.69 km2.
 
 SSI requires the following Python modules to be installed and available in your `PYTHONPATH`.
 
-* [matplotlib](https://pypi.org/project/matplotlib)
-* [numpy](https://pypi.org/project/numpy)
-* [Pillow](https://pypi.org/project/Pillow)
+* [matplotlib](https://pypi.org/project/matplotlib/)
+* [numpy](https://pypi.org/project/numpy/)
+* [PIL](https://pypi.org/project/Pillow/)
 * [pyguymer3](https://github.com/Guymer/PyGuymer3)
-* [scipy](https://pypi.org/project/scipy)
+* [scipy](https://pypi.org/project/scipy/)
