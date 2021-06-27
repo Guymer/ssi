@@ -19,6 +19,7 @@ except:
 # Import my modules ...
 try:
     import pyguymer3
+    import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -112,4 +113,4 @@ for date, total, equiv in zip(dates, totals, equivs):
     # Save plot ...
     fg.savefig(pname, bbox_inches = "tight", dpi = 300, pad_inches = 0.1)
     matplotlib.pyplot.close(fg)
-    pyguymer3.optimize_image(pname, strip = True)
+    pyguymer3.image.optimize_image(pname, strip = True)

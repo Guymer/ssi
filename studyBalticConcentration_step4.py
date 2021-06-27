@@ -14,6 +14,7 @@ except:
 # Import my modules ...
 try:
     import pyguymer3
+    import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -63,7 +64,7 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
 
     # Save frame ...
     im0.save(fname)
-    pyguymer3.optimize_image(fname, strip = True)
+    pyguymer3.image.optimize_image(fname, strip = True)
 
     # Clean up ...
     im0.close()
@@ -83,7 +84,7 @@ for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
 
 # Save 25fps GIF ...
 images[0].save("studyBalticConcentration/trends.gif", save_all = True, append_images = images[1:], duration = 40, loop = 0)
-pyguymer3.optimize_image("studyBalticConcentration/trends.gif", strip = True)
+pyguymer3.image.optimize_image("studyBalticConcentration/trends.gif", strip = True)
 
 # Clean up ...
 for image in images:
@@ -117,7 +118,7 @@ for width in widths:
 
     # Save 25fps GIF ...
     images[0].save("studyBalticConcentration/trends{:04d}px.gif".format(width), save_all = True, append_images = images[1:], duration = 40, loop = 0)
-    pyguymer3.optimize_image("studyBalticConcentration/trends{:04d}px.gif".format(width), strip = True)
+    pyguymer3.image.optimize_image("studyBalticConcentration/trends{:04d}px.gif".format(width), strip = True)
 
     # Clean up ...
     for image in images:

@@ -30,6 +30,7 @@ except:
 # Import my modules ...
 try:
     import pyguymer3
+    import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -123,8 +124,8 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
             img[iy:iy + chars.shape[0], ix:ix + sp, :] = chars[:, idx * sp:(idx + 1) * sp, :]
 
     # Save image ...
-    pyguymer3.save_array_as_PNG(img, iname, ftype_req = 0)
-    pyguymer3.optimize_image(iname, strip = True)
+    pyguymer3.image.save_array_as_PNG(img, iname, ftype_req = 0)
+    pyguymer3.image.optimize_image(iname, strip = True)
 
     # Clean up ...
     del img
