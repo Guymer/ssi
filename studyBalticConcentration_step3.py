@@ -50,17 +50,18 @@ totals = []
 equivs = []
 labels_loc = []
 labels_txt = []
-for line in open("studyBalticConcentration/trends.csv", "rt"):
-    if line.startswith("date,"):
-        continue
-    parts = line.strip().split(",")
-    dates.append(parts[0])
-    yyyy, mm, dd = parts[0].split("-")
-    if int(mm) % 3 == 0 and int(dd) == 1:
-        labels_loc.append(parts[0])
-        labels_txt.append(f"{months[mm]}/{yyyy[2:]}")
-    totals.append(0.001 * float(parts[1]))                                      # [10^3 km2]
-    equivs.append(0.001 * float(parts[2]))                                      # [10^3 km2]
+with open("studyBalticConcentration/trends.csv", "rt", encoding = "utf-8") as fobj:
+    for line in fobj:
+        if line.startswith("date,"):
+            continue
+        parts = line.strip().split(",")
+        dates.append(parts[0])
+        yyyy, mm, dd = parts[0].split("-")
+        if int(mm) % 3 == 0 and int(dd) == 1:
+            labels_loc.append(parts[0])
+            labels_txt.append(f"{months[mm]}/{yyyy[2:]}")
+        totals.append(0.001 * float(parts[1]))                                  # [10^3 km2]
+        equivs.append(0.001 * float(parts[2]))                                  # [10^3 km2]
 
 # ******************************************************************************
 

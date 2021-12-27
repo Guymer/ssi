@@ -55,7 +55,7 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
         continue
 
     # Open CSV file ...
-    with open(hname, "wt") as fobj:
+    with open(hname, "wt", encoding = "utf-8") as fobj:
         # Write header ...
         fobj.write("sea ice concentration [%],area [km2]\n")
 
@@ -64,7 +64,7 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
             # Write data ...
             # NOTE: This only works because the web site for the dataset states
             #       that the grid is 1km x 1km.
-            fobj.write("{:d},{:d}\n".format(conc, (lvl == conc).sum()))
+            fobj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
 
     # Clean up ...
     del lvl
@@ -98,7 +98,7 @@ print("Saving trends ...")
 stub = datetime.date(2018, 1, 1)
 
 # Open CSV file ...
-with open("studyBalticConcentration/trends.csv", "wt") as fobj:
+with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fobj:
     # Write header ...
     fobj.write("date,total sea ice area [km2],100%-concentration equivalent sea ice area [km2]\n")
 
@@ -110,25 +110,13 @@ with open("studyBalticConcentration/trends.csv", "wt") as fobj:
         # Check what to do ...
         if len(hnames) == 0:
             # Write data ...
-            fobj.write(
-                "{:s},{:d},{:e}\n".format(
-                    stub.isoformat(),
-                    0,                                                          # [km2]
-                    0.0,                                                        # [km2]
-                )
-            )
+            fobj.write(f"{stub.isoformat()},{0:d},{0.0:e}\n")
         else:
             # Load most up-to-date histogram for the day ...
             x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True) # [km2], [km2]
 
             # Write data ...
-            fobj.write(
-                "{:s},{:d},{:e}\n".format(
-                    stub.isoformat(),
-                    y[1:101].sum(),                                             # [km2]
-                    0.01 * numpy.dot(x[1:101], y[1:101]),                       # [km2]
-                )
-            )
+            fobj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
 
         # Increment date stub ...
         stub = stub + datetime.timedelta(days = 1)

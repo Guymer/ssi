@@ -99,7 +99,7 @@ widths = [512, 1024, 2048]                                                      
 
 # Loop over widths ...
 for width in widths:
-    print("Making \"studyBalticConcentration/trends{:04d}px.gif\" ...".format(width))
+    print(f"Making \"studyBalticConcentration/trends{width:04d}px.gif\" ...")
 
     # Initialize list ...
     images = []
@@ -117,8 +117,8 @@ for width in widths:
         images.append(image.resize((width, height), resample = PIL.Image.LANCZOS))
 
     # Save 25fps GIF ...
-    images[0].save("studyBalticConcentration/trends{:04d}px.gif".format(width), save_all = True, append_images = images[1:], duration = 40, loop = 0)
-    pyguymer3.image.optimize_image("studyBalticConcentration/trends{:04d}px.gif".format(width), strip = True)
+    images[0].save(f"studyBalticConcentration/trends{width:04d}px.gif", save_all = True, append_images = images[1:], duration = 40, loop = 0)
+    pyguymer3.image.optimize_image(f"studyBalticConcentration/trends{width:04d}px.gif", strip = True)
 
     # Clean up ...
     for image in images:
