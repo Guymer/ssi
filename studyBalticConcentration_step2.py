@@ -30,7 +30,7 @@ if not os.path.exists("studyBalticConcentration/histograms"):
 for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
     # Deduce histogram name and skip if it already exists ...
     stub = fname.split("_")[-1][:-3]
-    hname = os.path.join("studyBalticConcentration/histograms", f"{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv")
+    hname = f"studyBalticConcentration/histograms/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv"
     if os.path.exists(hname):
         continue
 
@@ -80,7 +80,13 @@ max2 = 0.0                                                                      
 # Loop over histograms ...
 for hname in sorted(glob.glob("studyBalticConcentration/histograms/????-??-??_??-??.csv")):
     # Load histogram ...
-    x, y = numpy.loadtxt(hname, delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True)
+    x, y = numpy.loadtxt(
+        hname,
+        delimiter = ",",
+            dtype = numpy.int32,
+         skiprows = 1,
+           unpack = True,
+    )                                                                           # [km2], [km2]
 
     # Update maxima ...
     max1 = max(max1, y[1:101].max())                                            # [km2]
@@ -97,6 +103,9 @@ print("Saving trends ...")
 # Define the start of the dataset ...
 stub = datetime.date(2018, 1, 1)
 
+# Initialize totals ...
+tots = {}
+
 # Open CSV file ...
 with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fobj:
     # Write header ...
@@ -104,6 +113,10 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
 
     # Loop over all dates since the start of the dataset ...
     while stub <= datetime.date.today():
+        # Initialize the totals and the year ...
+        if stub.year not in tots:
+            tots[stub.year] = 0.0                                               # [km2.day]
+
         # Find histograms ...
         hnames = sorted(glob.glob(f"studyBalticConcentration/histograms/{stub.isoformat()}_??-??.csv"))
 
@@ -113,10 +126,24 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
             fobj.write(f"{stub.isoformat()},{0:d},{0.0:e}\n")
         else:
             # Load most up-to-date histogram for the day ...
-            x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True) # [km2], [km2]
+            x, y = numpy.loadtxt(
+                hnames[-1],
+                delimiter = ",",
+                    dtype = numpy.int32,
+                 skiprows = 1,
+                   unpack = True,
+            )                                                                   # [km2], [km2]
+
+            # Increment total ...
+            tots[stub.year] += 0.01 * numpy.dot(x[1:101], y[1:101])             # [km2.day]
 
             # Write data ...
             fobj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
 
         # Increment date stub ...
         stub = stub + datetime.timedelta(days = 1)
+
+# Loop over years ...
+for year in sorted(tots.keys()):
+    # Print total ...
+    print(f"{year:d} = {tots[year]:,.1f} km2.day")
