@@ -101,8 +101,18 @@ for date, total, equiv in zip(dates, totals, equivs):
     # Configure plot ...
     ax[0].grid()
     ax[0].set_xlim(dates[0], dates[-1])
-    ax[0].set_xticks(labels_loc)
-    ax[0].set_xticklabels(labels_txt, ha = "right", rotation = 45)
+    # ax[0].set_xticks(                                                           # MatPlotLib ≥ 3.5.0
+    #     labels_loc,                                                             # MatPlotLib ≥ 3.5.0
+    #       labels = labels_txt,                                                  # MatPlotLib ≥ 3.5.0
+    #           ha = "right",                                                     # MatPlotLib ≥ 3.5.0
+    #     rotation = 45,                                                          # MatPlotLib ≥ 3.5.0
+    # )                                                                           # MatPlotLib ≥ 3.5.0
+    ax[0].set_xticks(labels_loc)                                                # MatPlotLib < 3.5.0
+    ax[0].set_xticklabels(                                                      # MatPlotLib < 3.5.0
+        labels_txt,                                                             # MatPlotLib < 3.5.0
+              ha = "right",                                                     # MatPlotLib < 3.5.0
+        rotation = 45,                                                          # MatPlotLib < 3.5.0
+    )                                                                           # MatPlotLib < 3.5.0
     ax[0].set_ylabel("100%-Concentration Equivalent\nSea Ice Area [10³ km²]")
     ax[0].set_ylim(0.0, 170.0)
     ax[1].grid()
