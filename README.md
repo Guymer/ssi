@@ -16,7 +16,7 @@ If you register for a free account at [Copernicus Marine Environment Monitoring 
 2. Create PNG maps of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step1.py](studyBalticConcentration_step1.py))
 3. Create CSV histograms of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step2.py](studyBalticConcentration_step2.py))
 4. Create PNG plots of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step3.py](studyBalticConcentration_step3.py))
-5. Create PNG frames *and* WEBP animations of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step4.py](studyBalticConcentration_step4.py))
+5. Create PNG frames *and* MP4 video *and* WEBP animations of Baltic Sea sea ice concentration (by running [studyBalticConcentration_step4.py](studyBalticConcentration_step4.py))
 
 ## Output
 

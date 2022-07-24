@@ -3,6 +3,7 @@
 # Import standard modules ...
 import glob
 import os
+import shutil
 
 # Import special modules ...
 try:
@@ -15,6 +16,7 @@ except:
 try:
     import pyguymer3
     import pyguymer3.image
+    import pyguymer3.media
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
 
@@ -72,6 +74,20 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
 
 # ******************************************************************************
 
+print(" > Making \"studyBalticConcentration/trends.mp4\" ...")
+
+# Set list ...
+frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
+
+# Save 25fps MP4 ...
+vname = pyguymer3.media.images2mp4(frames)
+shutil.move(vname, "studyBalticConcentration/trends.mp4")
+
+# Clean up ...
+del frames
+
+# ******************************************************************************
+
 print("Making \"studyBalticConcentration/trends.webp\" ...")
 
 # Initialize list ...
@@ -97,7 +113,7 @@ del images
 
 # Set widths ...
 # NOTE: By inspection, the PNG frames are 2412 wide.
-widths = [512, 1024, 2048]                                                      # [px]
+widths = [256, 512, 1024, 2048]                                                 # [px]
 
 # Loop over widths ...
 for width in widths:
