@@ -117,6 +117,20 @@ widths = [256, 512, 1024, 2048]                                                 
 
 # Loop over widths ...
 for width in widths:
+    print(f" > Making \"studyBalticConcentration/trends{width:04d}px.mp4\" ...")
+
+    # Set list ...
+    frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
+
+    # Save 25fps MP4 ...
+    vname = pyguymer3.media.images2mp4(frames, screenWidth = width, screenHeight = width)
+    shutil.move(vname, f"studyBalticConcentration/trends{width:04d}px.mp4")
+
+    # Clean up ...
+    del frames
+
+    # **************************************************************************
+
     print(f"Making \"studyBalticConcentration/trends{width:04d}px.webp\" ...")
 
     # Initialize list ...
