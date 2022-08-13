@@ -74,7 +74,7 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
 
 # ******************************************************************************
 
-print(" > Making \"studyBalticConcentration/trends.mp4\" ...")
+print("Making \"studyBalticConcentration/trends.mp4\" ...")
 
 # Set list ...
 frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
@@ -117,7 +117,7 @@ widths = [256, 512, 1024, 2048]                                                 
 
 # Loop over widths ...
 for width in widths:
-    print(f" > Making \"studyBalticConcentration/trends{width:04d}px.mp4\" ...")
+    print(f"Making \"studyBalticConcentration/trends{width:04d}px.mp4\" ...")
 
     # Set list ...
     frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
