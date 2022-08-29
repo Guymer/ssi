@@ -49,8 +49,10 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
     inames = sorted(glob.glob(f"studyBalticConcentration/maps/{date}_??-??.png"))
 
     # Load images ...
-    im1 = PIL.Image.open(inames[-1]).convert("RGB")
-    im2 = PIL.Image.open(pname).convert("RGB")
+    with PIL.Image.open(inames[-1]) as iObj:
+        im1 = iObj.convert("RGB")
+    with PIL.Image.open(pname) as iObj:
+        im2 = iObj.convert("RGB")
 
     # Create empty frame ...
     im0 = PIL.Image.new("RGB", (im1.width + im2.width + 30, max(im1.height, im2.height) + 20), (242, 242, 242))
@@ -60,8 +62,6 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
     im0.paste(im2, (20 + im1.width, 10 + ((im0.height - 20) - im2.height) // 2))
 
     # Clean up ...
-    im1.close()
-    im2.close()
     del im1, im2
 
     # Save frame ...
@@ -69,7 +69,6 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
     pyguymer3.image.optimize_image(fname, strip = True)
 
     # Clean up ...
-    im0.close()
     del im0
 
 # ******************************************************************************
@@ -96,7 +95,8 @@ images = []
 # Loop over frames ...
 for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
     # Open image as RGB (even if it is paletted) ...
-    image = PIL.Image.open(fname).convert("RGB")
+    with PIL.Image.open(fname) as iObj:
+        image = iObj.convert("RGB")
 
     # Append it to the list ...
     images.append(image)
@@ -105,8 +105,6 @@ for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
 images[0].save("studyBalticConcentration/trends.webp", lossless = True, quality = 100, method = 6, save_all = True, append_images = images[1:], duration = 40, loop = 0, minimize_size = True)
 
 # Clean up ...
-for image in images:
-    image.close()
 del images
 
 # ******************************************************************************
@@ -139,7 +137,8 @@ for width in widths:
     # Loop over frames ...
     for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
         # Open image as RGB (even if it is paletted) ...
-        image = PIL.Image.open(fname).convert("RGB")
+        with PIL.Image.open(fname) as iObj:
+            image = iObj.convert("RGB")
 
         # Calculate height ...
         ratio = float(image.width) / float(image.height)                        # [px/px]
@@ -152,6 +151,4 @@ for width in widths:
     images[0].save(f"studyBalticConcentration/trends{width:04d}px.webp", lossless = True, quality = 100, method = 6, save_all = True, append_images = images[1:], duration = 40, loop = 0, minimize_size = True)
 
     # Clean up ...
-    for image in images:
-        image.close()
     del images
