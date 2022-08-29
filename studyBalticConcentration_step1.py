@@ -43,7 +43,8 @@ PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 
 sp = 12                                                                         # [px]
 
 # Load alphabet ...
-chars = numpy.array(PIL.Image.open("makeAlphabet.png").convert("RGB"))
+with PIL.Image.open("makeAlphabet.png") as iObj:
+    chars = numpy.array(iObj.convert("RGB"))
 
 # ******************************************************************************
 
