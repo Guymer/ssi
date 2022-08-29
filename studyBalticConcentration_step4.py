@@ -104,7 +104,11 @@ for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
     images.append(image)
 
 # Save 25fps WEBP ...
-images[0].save("studyBalticConcentration/trends.webp", lossless = True, quality = 100, method = 6, save_all = True, append_images = images[1:], duration = 40, loop = 0, minimize_size = True)
+pyguymer3.media.images2webp(
+    images,
+    "studyBalticConcentration/trends.webp",
+    strip = True,
+)
 
 # Clean up ...
 del images
@@ -150,7 +154,11 @@ for width in widths:
         images.append(image.resize((width, height), resample = PIL.Image.Resampling.LANCZOS))
 
     # Save 25fps WEBP ...
-    images[0].save(f"studyBalticConcentration/trends{width:04d}px.webp", lossless = True, quality = 100, method = 6, save_all = True, append_images = images[1:], duration = 40, loop = 0, minimize_size = True)
+    pyguymer3.media.images2webp(
+        images,
+        f"studyBalticConcentration/trends{width:04d}px.webp",
+        strip = True,
+    )
 
     # Clean up ...
     del images
