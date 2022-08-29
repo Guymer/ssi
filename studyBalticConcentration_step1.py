@@ -42,9 +42,12 @@ PIL.Image.MAX_IMAGE_PIXELS = 1024 * 1024 * 1024                                 
 # Define character spacing ...
 sp = 12                                                                         # [px]
 
-# Load alphabet ...
+# Open image as RGB (even if it is paletted) ...
 with PIL.Image.open("makeAlphabet.png") as iObj:
-    chars = numpy.array(iObj.convert("RGB"))
+    chars = iObj.convert("RGB")
+
+# Convert to NumPy array ...
+chars = numpy.array(chars)
 
 # ******************************************************************************
 
