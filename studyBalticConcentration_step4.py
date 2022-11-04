@@ -75,90 +75,57 @@ for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
 
 # ******************************************************************************
 
-print("Making \"studyBalticConcentration/trends.mp4\" ...")
-
-# Set list ...
+# Find the frames ...
 frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
 
-# Save 25fps MP4 ...
-vname = pyguymer3.media.images2mp4(frames)
-shutil.move(vname, "studyBalticConcentration/trends.mp4")
+# ******************************************************************************
 
-# Clean up ...
-del frames
+print("Making \"studyBalticConcentration/trends.mp4\" ...")
+
+# Save 25fps MP4 ...
+vname = pyguymer3.media.images2mp4(
+    frames,
+)
+shutil.move(vname, "studyBalticConcentration/trends.mp4")
 
 # ******************************************************************************
 
 print("Making \"studyBalticConcentration/trends.webp\" ...")
 
-# Initialize list ...
-images = []
-
-# Loop over frames ...
-for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
-    # Open image as RGB (even if it is paletted) ...
-    with PIL.Image.open(fname) as iObj:
-        image = iObj.convert("RGB")
-
-    # Append it to the list ...
-    images.append(image)
-
 # Save 25fps WEBP ...
 pyguymer3.media.images2webp(
-    images,
+    frames,
     "studyBalticConcentration/trends.webp",
     strip = True,
 )
 
-# Clean up ...
-del images
-
 # ******************************************************************************
 
-# Set widths ...
-# NOTE: By inspection, the PNG frames are 2412 wide.
-widths = [256, 512, 1024, 2048]                                                 # [px]
+# Set maximum sizes ...
+# NOTE: By inspection, the PNG frames are 2412px wide.
+maxSizes = [256, 512, 1024, 2048]                                               # [px]
 
-# Loop over widths ...
-for width in widths:
-    print(f"Making \"studyBalticConcentration/trends{width:04d}px.mp4\" ...")
-
-    # Set list ...
-    frames = sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png"))
+# Loop over maximum sizes ...
+for maxSize in maxSizes:
+    print(f"Making \"studyBalticConcentration/trends{maxSize:04d}px.mp4\" ...")
 
     # Save 25fps MP4 ...
-    vname = pyguymer3.media.images2mp4(frames, screenWidth = width, screenHeight = width)
-    shutil.move(vname, f"studyBalticConcentration/trends{width:04d}px.mp4")
-
-    # Clean up ...
-    del frames
+    vname = pyguymer3.media.images2mp4(
+        frames,
+         screenWidth = maxSize,
+        screenHeight = maxSize,
+    )
+    shutil.move(vname, f"studyBalticConcentration/trends{maxSize:04d}px.mp4")
 
     # **************************************************************************
 
-    print(f"Making \"studyBalticConcentration/trends{width:04d}px.webp\" ...")
-
-    # Initialize list ...
-    images = []
-
-    # Loop over frames ...
-    for fname in sorted(glob.glob("studyBalticConcentration/frames/????-??-??.png")):
-        # Open image as RGB (even if it is paletted) ...
-        with PIL.Image.open(fname) as iObj:
-            image = iObj.convert("RGB")
-
-        # Calculate height ...
-        ratio = float(image.width) / float(image.height)                        # [px/px]
-        height = round(float(width) / ratio)                                    # [px]
-
-        # Downscale the image and append it to the list ...
-        images.append(image.resize((width, height), resample = PIL.Image.Resampling.LANCZOS))
+    print(f"Making \"studyBalticConcentration/trends{maxSize:04d}px.webp\" ...")
 
     # Save 25fps WEBP ...
     pyguymer3.media.images2webp(
-        images,
-        f"studyBalticConcentration/trends{width:04d}px.webp",
-        strip = True,
+        frames,
+        f"studyBalticConcentration/trends{maxSize:04d}px.webp",
+         screenWidth = maxSize,
+        screenHeight = maxSize,
+               strip = True,
     )
-
-    # Clean up ...
-    del images
