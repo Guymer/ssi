@@ -113,9 +113,17 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
 
     # Loop over all dates since the start of the dataset ...
     while stub <= datetime.date.today():
-        # Initialize the totals and the year ...
-        if stub.year not in tots:
-            tots[stub.year] = 0.0                                               # [km2.day]
+        # Deduce key for the totals ...
+        # NOTE: If the date is after the summer solstice then it is part of next
+        #       year's winter.
+        if stub < datetime.date(stub.year, 6, 21):
+            key = stub.year
+        else:
+            key = stub.year + 1
+
+        # Initialize the total for the year ...
+        if key not in tots:
+            tots[key] = 0.0                                                     # [km2.day]
 
         # Find histograms ...
         hnames = sorted(glob.glob(f"studyBalticConcentration/histograms/{stub.isoformat()}_??-??.csv"))
@@ -135,7 +143,7 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
             )                                                                   # [km2], [km2]
 
             # Increment total ...
-            tots[stub.year] += 0.01 * numpy.dot(x[1:101], y[1:101])             # [km2.day]
+            tots[key] += 0.01 * numpy.dot(x[1:101], y[1:101])                   # [km2.day]
 
             # Write data ...
             fobj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
