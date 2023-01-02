@@ -9,6 +9,7 @@ try:
     import matplotlib
     matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
     import matplotlib.pyplot
+    matplotlib.pyplot.rcParams.update({"font.size" : 8})
 except:
     raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
 try:
@@ -22,9 +23,6 @@ try:
     import pyguymer3.image
 except:
     raise Exception("\"pyguymer3\" is not installed; you need to have the Python module from https://github.com/Guymer/PyGuymer3 located somewhere in your $PYTHONPATH") from None
-
-# Configure matplotlib ...
-matplotlib.pyplot.rcParams.update({"font.size" : 6})
 
 # ******************************************************************************
 
