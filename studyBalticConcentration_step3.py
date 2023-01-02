@@ -48,8 +48,8 @@ totals = []
 equivs = []
 labels_loc = []
 labels_txt = []
-with open("studyBalticConcentration/trends.csv", "rt", encoding = "utf-8") as fobj:
-    for line in fobj:
+with open("studyBalticConcentration/trends.csv", "rt", encoding = "utf-8") as fObj:
+    for line in fObj:
         if line.startswith("date,"):
             continue
         parts = line.strip().split(",")

@@ -39,9 +39,9 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
     # Skip if there are errors ...
     try:
         # Open NetCDF file ...
-        with scipy.io.netcdf_file(fname, mode = "r") as fobj:
+        with scipy.io.netcdf_file(fname, mode = "r") as fObj:
             # Extract the first layer from a copy of the dataset ...
-            lvl = fobj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.int8)
+            lvl = fObj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.int8)
     except:
         print(" > Skipping, error loading NetCDF.")
         continue
@@ -55,16 +55,16 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
         continue
 
     # Open CSV file ...
-    with open(hname, "wt", encoding = "utf-8") as fobj:
+    with open(hname, "wt", encoding = "utf-8") as fObj:
         # Write header ...
-        fobj.write("sea ice concentration [%],area [km2]\n")
+        fObj.write("sea ice concentration [%],area [km2]\n")
 
         # Loop over concentrations ...
         for conc in range(101):
             # Write data ...
             # NOTE: This only works because the web site for the dataset states
             #       that the grid is 1km x 1km.
-            fobj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
+            fObj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
 
     # Clean up ...
     del lvl
@@ -107,9 +107,9 @@ stub = datetime.date(2018, 1, 1)
 tots = {}
 
 # Open CSV file ...
-with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fobj:
+with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fObj:
     # Write header ...
-    fobj.write("date,total sea ice area [km2],100%-concentration equivalent sea ice area [km2]\n")
+    fObj.write("date,total sea ice area [km2],100%-concentration equivalent sea ice area [km2]\n")
 
     # Loop over all dates since the start of the dataset ...
     while stub <= datetime.date.today():
@@ -131,7 +131,7 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
         # Check what to do ...
         if len(hnames) == 0:
             # Write data ...
-            fobj.write(f"{stub.isoformat()},{0:d},{0.0:e}\n")
+            fObj.write(f"{stub.isoformat()},{0:d},{0.0:e}\n")
         else:
             # Load most up-to-date histogram for the day ...
             x, y = numpy.loadtxt(
@@ -146,7 +146,7 @@ with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fo
             tots[key] += 0.01 * numpy.dot(x[1:101], y[1:101])                   # [km2.day]
 
             # Write data ...
-            fobj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
+            fObj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
 
         # Increment date stub ...
         stub = stub + datetime.timedelta(days = 1)

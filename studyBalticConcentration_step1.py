@@ -74,10 +74,10 @@ for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_
     # Skip if there are errors ...
     try:
         # Open NetCDF file ...
-        with scipy.io.netcdf_file(fname, mode = "r") as fobj:
+        with scipy.io.netcdf_file(fname, mode = "r") as fObj:
             # Extract the first layer from a copy of the dataset and scale it
             # from 0 to 1 ...
-            lvl = 0.01 * fobj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.float32)
+            lvl = 0.01 * fObj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.float32)
     except:
         print(" > Skipping, error loading NetCDF.")
         continue
