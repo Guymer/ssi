@@ -7,9 +7,14 @@ import os
 # Import special modules ...
 try:
     import matplotlib
-    matplotlib.use("Agg")                                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+    matplotlib.rcParams.update(
+        {
+               "backend" : "Agg",                                               # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+            "figure.dpi" : 300,
+             "font.size" : 8,
+        }
+    )
     import matplotlib.pyplot
-    matplotlib.pyplot.rcParams.update({"font.size" : 8})
 except:
     raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
 try:
@@ -87,8 +92,10 @@ for date, total, equiv in zip(dates, totals, equivs):
     # Convert to useful units ...
     y = y.astype(numpy.float32) * 0.001                                         # [10^3 km2]
 
-    # Create plot ...
-    fg = matplotlib.pyplot.figure(figsize = (4, 5.7), dpi = 300)
+    # Create figure ...
+    fg = matplotlib.pyplot.figure(figsize = (4, 5.7))
+
+    # Create axes ...
     ax = fg.subplots(2, 1)
 
     # Plot data ...
@@ -96,7 +103,7 @@ for date, total, equiv in zip(dates, totals, equivs):
     ax[0].bar([date], [equiv], width = 10)
     ax[1].bar(x, y, width = 1)
 
-    # Configure plot ...
+    # Configure axis ...
     ax[0].grid()
     ax[0].set_xlim(dates[0], dates[-1])
     # ax[0].set_xticks(                                                           # MatPlotLib ≥ 3.5.0
@@ -113,13 +120,20 @@ for date, total, equiv in zip(dates, totals, equivs):
     )                                                                           # MatPlotLib < 3.5.0
     ax[0].set_ylabel("100%-Concentration Equivalent\nSea Ice Area [10³ km²]")
     ax[0].set_ylim(0.0, 170.0)
+
+    # Configure axis ...
     ax[1].grid()
     ax[1].set_xlabel("Concentration [%]")
     ax[1].set_xlim(0, 100)
     ax[1].set_ylabel("Sea Ice Area [10³ km²]")
     ax[1].set_ylim(0, 85)
 
-    # Save plot ...
-    fg.savefig(pname, bbox_inches = "tight", dpi = 300, pad_inches = 0.1)
+    # Configure figure ...
+    fg.tight_layout()
+
+    # Save figure ...
+    fg.savefig(pname)
     matplotlib.pyplot.close(fg)
+
+    # Optimize PNG ...
     pyguymer3.image.optimize_image(pname, strip = True)
