@@ -32,7 +32,7 @@ if __name__ == "__main__":
     # Loop over NetCDF files ...
     for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
         # Deduce histogram name and skip if it already exists ...
-        stub = fname.split("_")[-1][:-3]
+        stub = fname.split("_")[-1].removesuffix(".nc")
         hname = f"studyBalticConcentration/histograms/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv"
         if os.path.exists(hname):
             continue
