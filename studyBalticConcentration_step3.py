@@ -96,7 +96,7 @@ if __name__ == "__main__":
         y = y.astype(numpy.float32) * 0.001                                     # [10^3 km2]
 
         # Create figure ...
-        fg = matplotlib.pyplot.figure(figsize = (4, 5.7))
+        fg = matplotlib.pyplot.figure(figsize = (4.1, 4.9))
 
         # Create axes ...
         ax = fg.subplots(2, 1)
