@@ -57,8 +57,18 @@ if __name__ == "__main__":
         with PIL.Image.open(pname) as iObj:
             im2 = iObj.convert("RGB")
 
+        # Calculate width (ensuring that it is even) ...
+        w = im1.width + im2.width + 30                                          # [px]
+        if w % 2 == 1:
+            w += 1                                                              # [px]
+
+        # Calculate height (ensuring that it is even) ...
+        h = max(im1.height, im2.height) + 20                                    # [px]
+        if h % 2 == 1:
+            h += 1                                                              # [px]
+
         # Create empty frame ...
-        im0 = PIL.Image.new("RGB", (im1.width + im2.width + 30, max(im1.height, im2.height) + 20), (242, 242, 242))
+        im0 = PIL.Image.new("RGB", (w, h), (242, 242, 242))
 
         # Add the map and the plot ...
         im0.paste(im1, (10, 10 + ((im0.height - 20) - im1.height) // 2))
