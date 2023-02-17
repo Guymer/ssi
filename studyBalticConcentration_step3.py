@@ -72,7 +72,7 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Loop over dates ...
-    for date, total, equiv in zip(dates, totals, equivs):
+    for date, total, equiv in zip(dates, totals, equivs, strict = True):
         # Deduce plot name and skip if it already exists ...
         pname = f"studyBalticConcentration/plots/{date}.png"
         if os.path.exists(pname):
