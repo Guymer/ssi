@@ -74,15 +74,9 @@ if __name__ == "__main__":
         im0.paste(im1, (10, 10 + ((im0.height - 20) - im1.height) // 2))
         im0.paste(im2, (20 + im1.width, 10 + ((im0.height - 20) - im2.height) // 2))
 
-        # Clean up ...
-        del im1, im2
-
         # Save frame ...
         im0.save(fname)
         pyguymer3.image.optimize_image(fname, strip = True)
-
-        # Clean up ...
-        del im0
 
     # **************************************************************************
 

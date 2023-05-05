@@ -51,9 +51,6 @@ if __name__ == "__main__":
 
         # Skip if there isn't any sea ice ...
         if lvl.max() <= 0:
-            # Clean up ...
-            del lvl
-
             print(" > Skipping, no sea ice.")
             continue
 
@@ -68,9 +65,6 @@ if __name__ == "__main__":
                 # NOTE: This only works because the web site for the dataset
                 #       states that the grid is 1km x 1km.
                 fObj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
-
-        # Clean up ...
-        del lvl
 
     # **************************************************************************
 

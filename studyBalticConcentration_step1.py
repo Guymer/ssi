@@ -92,9 +92,6 @@ if __name__ == "__main__":
 
         # Skip if there isn't any sea ice ...
         if lvl.max() <= 0.0:
-            # Clean up ...
-            del lvl
-
             print(" > Skipping, no sea ice.")
             continue
 
@@ -110,9 +107,6 @@ if __name__ == "__main__":
                     img[iy, ix, 0] = 255.0 * r
                     img[iy, ix, 1] = 255.0 * g
                     img[iy, ix, 2] = 255.0 * b
-
-        # Clean up ...
-        del lvl
 
         # Declare overlays ...
         overlays = [
@@ -137,6 +131,3 @@ if __name__ == "__main__":
         # Save image ...
         pyguymer3.image.save_array_as_PNG(img, iname, ftype_req = 0)
         pyguymer3.image.optimize_image(iname, strip = True)
-
-        # Clean up ...
-        del img
