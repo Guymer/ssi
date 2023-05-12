@@ -33,7 +33,6 @@ if __name__ == "__main__":
         raise Exception("\"PIL\" is not installed; run \"pip install --user Pillow\"") from None
     try:
         import scipy
-        import scipy.io
     except:
         raise Exception("\"scipy\" is not installed; run \"pip install --user scipy\"") from None
 
