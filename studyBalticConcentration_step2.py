@@ -56,7 +56,7 @@ if __name__ == "__main__":
         # Open CSV file ...
         with open(hname, "wt", encoding = "utf-8") as fObj:
             # Write header ...
-            fObj.write("sea ice concentration [%],area [km2]\n")
+            fObj.write("sea ice concentration [%],area [km²]\n")
 
             # Loop over concentrations ...
             for conc in range(101):
@@ -89,8 +89,8 @@ if __name__ == "__main__":
         max2 = max(max2, 0.01 * numpy.dot(x[1:101], y[1:101]))                  # [km2]
 
     # Print summary ...
-    print(f"The highest single non-zero occurrence is {max1} km2.")
-    print(f"The highest 100%-concentration equivalent occurrence is {max2} km2.")
+    print(f"The highest single non-zero occurrence is {max1:,d} km².")
+    print(f"The highest 100%-concentration equivalent occurrence is {max2:,.1f} km².")
 
     # **************************************************************************
 
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     # Open CSV file ...
     with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fObj:
         # Write header ...
-        fObj.write("date,total sea ice area [km2],100%-concentration equivalent sea ice area [km2]\n")
+        fObj.write("date,total sea ice area [km²],100%-concentration equivalent sea ice area [km²]\n")
 
         # Loop over all dates since the start of the dataset ...
         while stub <= datetime.date.today():

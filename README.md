@@ -23,8 +23,16 @@ If you register for a free account at [Copernicus Marine Environment Monitoring 
 The output of [studyBalticConcentration_step2.py](studyBalticConcentration_step2.py) is:
 
 ```
-The highest single non-zero occurrence is 84569 km2.
-The highest 100%-concentration equivalent occurrence is 166898.69 km2.
+Summarising ...
+The highest single non-zero occurrence is 84,569 km².
+The highest 100%-concentration equivalent occurrence is 166,898.7 km².
+Saving trends ...
+2018 = 9,334,863.9 km².day
+2019 = 6,020,943.4 km².day
+2020 = 2,251,272.7 km².day
+2021 = 6,345,430.9 km².day
+2022 = 7,316,733.1 km².day
+2023 = 6,212,165.2 km².day
 ```
 
 ## Dependencies
