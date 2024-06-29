@@ -101,7 +101,6 @@ if __name__ == "__main__":
     pyguymer3.media.images2webp(
         frames,
         "studyBalticConcentration/trends.webp",
-        strip = True,
     )
 
     # **************************************************************************
@@ -132,5 +131,4 @@ if __name__ == "__main__":
             f"studyBalticConcentration/trends{maxSize:04d}px.webp",
              screenWidth = maxSize,
             screenHeight = maxSize,
-                   strip = True,
         )
