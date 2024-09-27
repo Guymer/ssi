@@ -3,5 +3,6 @@
 
 pillow
 matplotlib
+meson
 numpy
 scipy
