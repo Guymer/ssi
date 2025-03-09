@@ -1,5 +1,7 @@
 # Study Sea Ice (SSI)
 
+!["mypy" GitHub Action Status](https://github.com/Guymer/ssi/actions/workflows/mypy.yaml/badge.svg) !["pylint" GitHub Action Status](https://github.com/Guymer/ssi/actions/workflows/pylint.yaml/badge.svg)
+
 This project aims to map the behaviour of sea ice.
 
 The following three sea ice datasets from the [Copernicus Marine Environment Monitoring Service](https://marine.copernicus.eu/) are each less than 10 GiB.
