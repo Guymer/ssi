@@ -10,6 +10,19 @@ if __name__ == "__main__":
 
     # Import special modules ...
     try:
+        import matplotlib
+        matplotlib.rcParams.update(
+            {
+                       "backend" : "Agg",                                       # NOTE: See https://matplotlib.org/stable/gallery/user_interfaces/canvasagg.html
+                    "figure.dpi" : 300,
+                "figure.figsize" : (9.6, 7.2),                                  # NOTE: See https://github.com/Guymer/misc/blob/main/README.md#matplotlib-figure-sizes
+                     "font.size" : 8,
+            }
+        )
+        import matplotlib.pyplot
+    except:
+        raise Exception("\"matplotlib\" is not installed; run \"pip install --user matplotlib\"") from None
+    try:
         import numpy
     except:
         raise Exception("\"numpy\" is not installed; run \"pip install --user numpy\"") from None
@@ -17,6 +30,13 @@ if __name__ == "__main__":
         import scipy
     except:
         raise Exception("\"scipy\" is not installed; run \"pip install --user scipy\"") from None
+
+    # Import my modules ...
+    try:
+        import pyguymer3
+        import pyguymer3.image
+    except:
+        raise Exception("\"pyguymer3\" is not installed; run \"pip install --user PyGuymer3\"") from None
 
     # **************************************************************************
 
@@ -147,7 +167,72 @@ if __name__ == "__main__":
             # Increment date stub ...
             stub = stub + datetime.timedelta(days = 1)
 
+    # Initialize lists ...
+    x = []
+    y = []                                                                      # [km2.day]
+
     # Loop over years ...
     for year in sorted(tots.keys()):
+        # Append values to lists ...
+        x.append(year)
+        y.append(tots[year])                                                    # [km2.day]
+
         # Print total ...
         print(f"{year:d} = {tots[year]:,.1f} km².day")
+
+    # Convert lists to arrays ...
+    x = numpy.array(x)
+    y = numpy.array(y)                                                          # [km2.day]
+
+    # **************************************************************************
+
+    # Create figure ...
+    fg = matplotlib.pyplot.figure()
+
+    # Create axis ...
+    ax = fg.add_subplot()
+
+    # Plot data ...
+    ax.plot(
+        x,
+        y,
+        marker = "d",
+    )
+
+    # Fit a straight line to the data ...
+    assert x.size == y.size
+    n = x.size
+    xbar = x.sum() / n
+    ybar = y.sum() / n
+    top = 0.0
+    bot = 0.0
+    for i in range(n):
+        top += (x[i] - xbar) * y[i]
+        bot += pow(x[i] - xbar, 2)
+    m = top / bot
+    c = ybar - m * xbar
+
+    # Plot data ...
+    ax.plot(
+        x,
+        m * x + c,
+    )
+
+    # Configure axis ...
+    ax.grid()
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Total 100%-Concentration Equivalent Sea Ice [km².day]")
+    ax.set_ylim(0.0)
+
+    # Configure figure ...
+    fg.tight_layout()
+
+    # Save figure ...
+    fg.savefig("studyBalticConcentration/tots.png")
+    matplotlib.pyplot.close(fg)
+
+    # Optimize PNG ...
+    pyguymer3.image.optimize_image(
+        "studyBalticConcentration/tots.png",
+        strip = True,
+    )
