@@ -45,9 +45,7 @@ if __name__ == "__main__":
 
     # Define month name abbreviations ...
     months = {
-        "03" : "Mar",
         "06" : "Jun",
-        "09" : "Sep",
         "12" : "Dec",
     }
 
@@ -64,7 +62,7 @@ if __name__ == "__main__":
             parts = line.strip().split(",")
             dates.append(parts[0])
             yyyy, mm, dd = parts[0].split("-")
-            if int(mm) % 3 == 0 and int(dd) == 1:
+            if int(mm) % 6 == 0 and int(dd) == 1:
                 labels_loc.append(parts[0])
                 labels_txt.append(f"{months[mm]}/{yyyy[2:]}")
             totals.append(0.001 * float(parts[1]))                              # [10^3 km2]
@@ -91,7 +89,13 @@ if __name__ == "__main__":
             continue
 
         # Load most up-to-date histogram for the day ...
-        x, y = numpy.loadtxt(hnames[-1], delimiter = ",", dtype = numpy.int32, skiprows = 1, unpack = True) # [%], [km2]
+        x, y = numpy.loadtxt(
+            hnames[-1],
+            delimiter = ",",
+                dtype = numpy.int32,
+             skiprows = 1,
+               unpack = True,
+        )                                                                       # [%], [km2]
 
         # Convert to useful units ...
         y = y.astype(numpy.float32) * 0.001                                     # [10^3 km2]
@@ -103,9 +107,21 @@ if __name__ == "__main__":
         ax = fg.subplots(2, 1)
 
         # Plot data ...
-        ax[0].bar(dates, equivs, width = 1)
-        ax[0].bar([date], [equiv], width = 10)
-        ax[1].bar(x, y, width = 1)
+        ax[0].bar(
+            dates,
+            equivs,
+            width = 1,
+        )
+        ax[0].bar(
+            [date],
+            [equiv],
+            width = 10,
+        )
+        ax[1].bar(
+            x,
+            y,
+            width = 1,
+        )
 
         # Configure axis ...
         ax[0].grid()
