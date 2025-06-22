@@ -59,7 +59,7 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Create short-hand ...
-    cm = matplotlib.pyplot.get_cmap("jet")
+    cm = matplotlib.colormaps["turbo"]
 
     # Make output directory ...
     if not os.path.exists("studyBalticConcentration"):
