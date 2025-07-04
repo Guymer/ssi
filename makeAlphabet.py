@@ -38,4 +38,4 @@ if __name__ == "__main__":
 
     # Save image ...
     im.save("makeAlphabet.png")
-    pyguymer3.image.optimize_image("makeAlphabet.png", strip = True)
+    pyguymer3.image.optimise_image("makeAlphabet.png", strip = True)

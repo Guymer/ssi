@@ -129,5 +129,5 @@ if __name__ == "__main__":
                 img[iy:iy + chars.shape[0], ix:ix + sp, :] = chars[:, idx * sp:(idx + 1) * sp, :]
 
         # Save image ...
-        pyguymer3.image.save_array_as_PNG(img, iname, ftype_req = 0)
-        pyguymer3.image.optimize_image(iname, strip = True)
+        pyguymer3.image.save_array_as_PNG(img, iname)
+        pyguymer3.image.optimise_image(iname, strip = True)

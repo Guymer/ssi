@@ -150,4 +150,4 @@ if __name__ == "__main__":
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        pyguymer3.image.optimize_image(pname, strip = True)
+        pyguymer3.image.optimise_image(pname, strip = True)

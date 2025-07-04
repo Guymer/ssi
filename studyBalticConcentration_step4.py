@@ -76,7 +76,7 @@ if __name__ == "__main__":
 
         # Save frame ...
         im0.save(fname)
-        pyguymer3.image.optimize_image(fname, strip = True)
+        pyguymer3.image.optimise_image(fname, strip = True)
 
     # **************************************************************************
 
