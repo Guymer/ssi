@@ -4,7 +4,9 @@
 # NOTE: See https://docs.python.org/3.12/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
+    import argparse
     import glob
+    import json
     import os
     import string
 
@@ -46,20 +48,36 @@ if __name__ == "__main__":
 
     # **************************************************************************
 
-    # Define character spacing ...
-    sp = 12                                                                     # [px]
-
-    # Open image as RGB (even if it is paletted) ...
-    with PIL.Image.open("makeAlphabet.png") as iObj:
-        chars = iObj.convert("RGB")
-
-    # Convert to NumPy array ...
-    chars = numpy.array(chars)
+    # Create argument parser and parse the arguments ...
+    parser = argparse.ArgumentParser(
+           allow_abbrev = False,
+            description = "Make maps of Baltic sea ice.",
+        formatter_class = argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--debug",
+        action = "store_true",
+          help = "print debug messages",
+    )
+    args = parser.parse_args()
 
     # **************************************************************************
 
-    # Create short-hand ...
-    cm = matplotlib.colormaps["turbo"]
+    # Define character spacing ...
+    sp = 12                                                                     # [px]
+
+    # Open image as RGB (even if it is paletted) and convert it to a NumPy array ...
+    with PIL.Image.open("makeAlphabet.png") as iObj:
+        charsImg = iObj.convert("RGB")
+    charsArr = numpy.array(charsImg)
+    del charsImg
+
+    # Load colour tables and create short-hand ...
+    with open(f"{pyguymer3.__path__[0]}/data/json/colourTables.json", "rt", encoding = "utf-8") as fObj:
+        colourTables = json.load(fObj)
+    turbo = numpy.array(colourTables["turbo"]).astype(numpy.uint8)
+
+    # **************************************************************************
 
     # Make output directory ...
     if not os.path.exists("studyBalticConcentration"):
@@ -83,9 +101,8 @@ if __name__ == "__main__":
         try:
             # Open NetCDF file ...
             with scipy.io.netcdf_file(fname, mode = "r") as fObj:
-                # Extract the first layer from a copy of the dataset and scale
-                # it from 0 to 1 ...
-                lvl = 0.01 * fObj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.float32)
+                # Extract the first layer from the dataset ...
+                lvl = fObj.variables["ice_concentration"].data[0, :, :].astype(numpy.float32)
         except:
             print(" > Skipping, error loading NetCDF.")
             continue
@@ -95,18 +112,32 @@ if __name__ == "__main__":
             print(" > Skipping, no sea ice.")
             continue
 
+        # Find the pixels which are land ...
+        isLand = numpy.transpose(numpy.where(lvl < 0.0))
+
+        # Scale data from 0 to 255, mapping it from 0 % to 100 % ...
+        lvl = 255.0 * (lvl / 100.0)
+        numpy.place(lvl, lvl <   0.0,   0.0)
+        numpy.place(lvl, lvl > 255.0, 255.0)
+        lvl = lvl.astype(numpy.uint8)
+
         # Make image ...
-        img = numpy.zeros((lvl.shape[0], lvl.shape[1], 3), dtype = numpy.uint8)
-        img[:, :, :] = 255
+        # NOTE: If I just wanted to make an image of the Baltic sea ice then I
+        #       could skip this step and just make a paletted image. However, as
+        #       I also want to use the colour white (for land) and the colour
+        #       black (for overlaid text) then there would be more than 256
+        #       colours in the palette. Therefore, it must be an RGB image.
+        img = numpy.zeros(
+            (lvl.shape[0], lvl.shape[1], 3),
+            dtype = numpy.uint8,
+        )
         for iy in range(lvl.shape[0]):
             for ix in range(lvl.shape[1]):
-                if lvl[iy, ix] < 0.0:
-                    img[iy, ix, :] = 255
-                else:
-                    r, g, b, a = cm(lvl[iy, ix])
-                    img[iy, ix, 0] = 255.0 * r
-                    img[iy, ix, 1] = 255.0 * g
-                    img[iy, ix, 2] = 255.0 * b
+                img[iy, ix, :] = turbo[lvl[iy, ix], :]
+        del lvl
+        for i in range(isLand.shape[0]):
+            img[isLand[i, 0], isLand[i, 1], :] = 255
+        del isLand
 
         # Declare overlays ...
         overlays = [
@@ -124,10 +155,29 @@ if __name__ == "__main__":
                 idx = string.printable.index(char)
 
                 # Overlay this character ...
-                iy = 1 + i * chars.shape[0]                                     # [px]
+                iy = 1 + i * charsArr.shape[0]                                  # [px]
                 ix = 1 + j * sp                                                 # [px]
-                img[iy:iy + chars.shape[0], ix:ix + sp, :] = chars[:, idx * sp:(idx + 1) * sp, :]
+                img[iy:iy + charsArr.shape[0], ix:ix + sp, :] = charsArr[:, idx * sp:(idx + 1) * sp, :]
 
-        # Save image ...
-        pyguymer3.image.save_array_as_PNG(img, iname)
-        pyguymer3.image.optimise_image(iname, strip = True)
+        # Make PNG ...
+        src = pyguymer3.image.makePng(
+            img,
+            calcAdaptive = True,
+             calcAverage = True,
+                calcNone = True,
+               calcPaeth = True,
+                 calcSub = True,
+                  calcUp = True,
+                 choices = "all",
+                   debug = args.debug,
+                     dpi = None,
+                  levels = [9,],
+               memLevels = [9,],
+                 modTime = None,
+                palUint8 = None,
+              strategies = None,
+                  wbitss = [15,],
+        )
+        with open(iname, "wb") as fObj:
+            fObj.write(src)
+        del img
