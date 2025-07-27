@@ -68,6 +68,7 @@ if __name__ == "__main__":
             h += 1                                                              # [px]
 
         # Create empty frame ...
+        assert (w * h) <= PIL.Image.MAX_IMAGE_PIXELS, f"image size is larger than maximum number of pixels allowed in Pillow ({w:,d} px × {h:,d} px > {PIL.Image.MAX_IMAGE_PIXELS:,d} px)"
         im0 = PIL.Image.new("RGB", (w, h), (242, 242, 242))
 
         # Add the map and the plot ...
