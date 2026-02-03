@@ -100,7 +100,7 @@ if __name__ == "__main__":
         )                                                                       # [%], [km2]
 
         # Convert to useful units ...
-        y = y.astype(numpy.float32) * 0.001                                     # [10^3 km2]
+        y = 0.001 * y.astype(numpy.float32)                                     # [10^3 km2]
 
         # Create figure ...
         fg = matplotlib.pyplot.figure(figsize = (4.1, 4.9))
