@@ -10,3 +10,4 @@ ninja # Required so that NumPy can use an up-to-date version (not the old
 numpy
 pyguymer3 >= 0.0.12
 scipy
+shapely
