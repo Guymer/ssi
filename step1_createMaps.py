@@ -115,6 +115,10 @@ if __name__ == "__main__":
             continue
 
         # Find the pixels which are land ...
+        # TODO: Survey the "isLand" pixels from each NetCDF and check that it
+        #       never changes.
+        # TODO: Survey the longitudes/latitudes from each NetCDF and check that
+        #       they never change.
         isLand = numpy.transpose(numpy.where(lvl < 0.0))
 
         # Scale data from 0 to 255, mapping it from 0 % to 100 % ...

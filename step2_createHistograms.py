@@ -83,8 +83,12 @@ if __name__ == "__main__":
             # Loop over concentrations ...
             for conc in range(101):
                 # Write data ...
-                # NOTE: This only works because the web site for the dataset
-                #       states that the grid is 1km x 1km.
+                # TODO: Interpolate the area of each pixel to this location. The
+                #       pixel area varies far more smoothly than the ice
+                #       concentration, therefore, it will introduce less
+                #       numerical error if the area is mapped to the
+                #       concentration rather than the concentration being mapped
+                #       to the area.
                 fObj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
 
     # **************************************************************************
