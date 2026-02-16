@@ -5,6 +5,7 @@
 if __name__ == "__main__":
     # Import standard modules ...
     import argparse
+    import glob
     import json
     import os
 
@@ -100,10 +101,11 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Create short-hands ...
-    bName = f'{__file__.removesuffix(".py")}.bin'
+    bName = f'{__file__.removesuffix(".py")}_areas_level={args.level:d}.bin'
     nName = "ice_conc_baltic_202602021400.nc"
-    pName1 = f'{__file__.removesuffix(".py")}_areas.png'
-    pName2 = f'{__file__.removesuffix(".py")}_points.png'
+    pName1 = f'{__file__.removesuffix(".py")}_areas_level={args.level:d}.png'
+    pName2 = f'{__file__.removesuffix(".py")}_areas.png'
+    pName3 = f'{__file__.removesuffix(".py")}_points.png'
 
     # Open NetCDF file ...
     with scipy.io.netcdf_file(nName, mode = "r") as fObj:
@@ -121,7 +123,7 @@ if __name__ == "__main__":
     print("The axes are the same length as the data. This means that the longitude/latitude values are either:")
     print(" * The pixel centres *not* the pixel edges. The extent of the pixels can never be known.")
     print(" * The upper-left corners and it is left as an exercise to the reader to calculate the other three corners. The lower corners of the lowest row can never be known. The right corners of the rightmost column can never be known.")
-    print("Neither of these possibilities are good - or, the data is a lie, and it is not grid-wise data but point-wise data.")
+    print("Neither of these possibilities are good - or, the data is a lie, and it is not grid-wise data but it is actually point-wise data.")
     print(f"The latitude values extend from {lat[0]:.6f} ° to {lat[-1]:.6f} °.")
     print(f"The longitude values extend from {lon[0]:.6f} ° to {lon[-1]:.6f} °.")
 
@@ -142,13 +144,7 @@ if __name__ == "__main__":
     print(f"The longitude percentage differences vary from {lonPerc.min():+.4f} % to {lonPerc.max():+.4f} %.")
 
     # Check if the BIN file needs making ...
-    if os.path.exists(bName):
-        # Load BIN file ...
-        area = numpy.fromfile(
-            bName,
-            dtype = numpy.float32,
-        ).reshape(lat.size - 1, lon.size - 1)                                   # [km2]
-    else:
+    if not os.path.exists(bName):
         # Calculate the area of each pixel assuming that the data is point-wise ...
         # NOTE: The progress string needs padding with extra spaces so that the
         #       line is fully overwritten when it inevitably gets shorter (as
@@ -156,7 +152,7 @@ if __name__ == "__main__":
         #       will ever be is "???.???% (~??h ??m ??.?s still to go)" (which
         #       is 37 characters).
         print("Calculating the area of the pixels ...")
-        area = numpy.zeros(
+        areas = numpy.zeros(
             (lat.size - 1, lon.size - 1),
             dtype = numpy.float32,
         )                                                                       # [km2]
@@ -174,7 +170,7 @@ if __name__ == "__main__":
                         ]
                     )
                 )
-                area[iLat, iLon] = pyguymer3.geo.area(
+                areas[iLat, iLon] = pyguymer3.geo.area(
                     pixel,
                       eps = args.eps,
                     level = args.level,
@@ -189,40 +185,49 @@ if __name__ == "__main__":
         print()
 
         # Save BIN file ...
-        area.tofile(bName)
+        areas.tofile(bName)
+    else:
+        # Load BIN file ...
+        areas = numpy.fromfile(
+            bName,
+            dtype = numpy.float32,
+        ).reshape(lat.size - 1, lon.size - 1)                                   # [km2]
 
-    print(f"The areas vary from {area.min():.6f} km² to {area.max():.6f} km².")
+    print(f"The areas vary from {areas.min():.6f} km² to {areas.max():.6f} km².")
 
-    # Make a NumPy array suitable for saving as a PNG (from 0.8 km2 to 1.2 km2) ...
-    tmpArr = 255.0 * (area.astype(numpy.float64) - 0.8) / 0.4
-    numpy.place(tmpArr, tmpArr <   0.0,   0.0)
-    numpy.place(tmpArr, tmpArr > 255.0, 255.0)
-    tmpArr = tmpArr.astype(numpy.uint8)
-    tmpArr = tmpArr.reshape(lat.size - 1, lon.size - 1, 1)
+    # Check if the PNG file needs making ...
+    if not os.path.exists(pName1):
+        # Make a NumPy array suitable for saving as a PNG (from 0.8 km2 to 1.2
+        # km2) ...
+        tmpArr = 255.0 * (areas.astype(numpy.float64) - 0.8) / 0.4
+        numpy.place(tmpArr, tmpArr <   0.0,   0.0)
+        numpy.place(tmpArr, tmpArr > 255.0, 255.0)
+        tmpArr = tmpArr.astype(numpy.uint8)
+        tmpArr = tmpArr.reshape(lat.size - 1, lon.size - 1, 1)
 
-    # Save PNG ...
-    tmpSrc = pyguymer3.image.makePng(
-        tmpArr,
-        calcAdaptive = True,
-         calcAverage = True,
-            calcNone = True,
-           calcPaeth = True,
-             calcSub = True,
-              calcUp = True,
-             choices = "all",
-               debug = args.debug,
-                 dpi = None,
-              levels = [9,],
-           memLevels = [9,],
-             modTime = None,
-            palUint8 = coolwarm,
-          strategies = None,
-              wbitss = [15,],
-    )
-    del tmpArr
-    with open(pName1, "wb") as fObj:
-        fObj.write(tmpSrc)
-    del tmpSrc
+        # Save PNG ...
+        tmpSrc = pyguymer3.image.makePng(
+            tmpArr,
+            calcAdaptive = True,
+             calcAverage = True,
+                calcNone = True,
+               calcPaeth = True,
+                 calcSub = True,
+                  calcUp = True,
+                 choices = "all",
+                   debug = args.debug,
+                     dpi = None,
+                  levels = [9,],
+               memLevels = [9,],
+                 modTime = None,
+                palUint8 = coolwarm,
+              strategies = None,
+                  wbitss = [15,],
+        )
+        del tmpArr
+        with open(pName1, "wb") as fObj:
+            fObj.write(tmpSrc)
+        del tmpSrc
 
     # Calculate histogram ...
     latHistX = numpy.linspace(nomLat - 15 * dLat, nomLat + 15 * dLat, num = 31) # [°]
@@ -239,6 +244,93 @@ if __name__ == "__main__":
     for key in keys:
         lonHistY[key] += 1                                                      # [#]
     del keys
+
+    # **************************************************************************
+
+    # Create figure ...
+    fg = matplotlib.pyplot.figure(figsize = (9.6, 7.2))
+
+    # Create axis ...
+    ax = fg.add_subplot()
+
+    # Create temporary arrays to hold the flattened indexes ...
+    tmpArr1D = numpy.zeros(
+        lat.size - 1,
+        dtype = numpy.uint32,
+    )
+    tmpArr2D = numpy.zeros(
+        (lat.size - 1, lon.size - 1),
+        dtype = numpy.uint32,
+    )
+    for iLat in range(lat.size - 1):
+        tmpArr1D[iLat] = iLat
+        tmpArr2D[iLat, :] = iLat
+
+    # Loop over generated binary files ...
+    for bName in sorted(glob.glob(f'{__file__.removesuffix(".py")}_areas_level=?.bin')):
+        # Create short-hands ...
+        jName = f'{bName.removesuffix(".bin")}.json'
+        label = bName.removesuffix(".bin").split("_")[-1]
+
+        # Load BIN file ...
+        areas = numpy.fromfile(
+            bName,
+            dtype = numpy.float32,
+        ).reshape(lat.size - 1, lon.size - 1)                                   # [km2]
+
+        # Fit a polynomial degree 2 to the data ...
+        coef = numpy.polynomial.polynomial.Polynomial.fit(
+            tmpArr2D.flatten(),
+            areas.flatten(),
+            2,
+        ).convert().coef
+
+        # Save polynomial degree 2 as a JSON (manually, because I really want to
+        # specify the format/precision of the coefficients) ...
+        with open(jName, "wt", encoding = "utf-8") as fObj:
+            fObj.write("[\n")
+            fObj.write(f"    {coef[0]:.15e},\n")
+            fObj.write(f"    {coef[1]:.15e},\n")
+            fObj.write(f"    {coef[2]:.15e}\n")
+            fObj.write("]")
+
+        print(f"  {label} : {coef[0]:.3e} + {coef[1]:.3e} x + {coef[2]:.3e} x²")
+
+        # Plot data ...
+        ax.scatter(
+            tmpArr2D.flatten(),
+            areas.flatten(),
+             label = label,
+            marker = ".",
+        )
+        ax.plot(
+            tmpArr1D,
+            coef[0] + coef[1] * tmpArr1D + coef[2] * tmpArr1D * tmpArr1D,
+            label = f"{label} (fit)",
+        )
+
+    # Configure axis ...
+    ax.grid()
+    ax.legend(loc = "upper left")
+    ax.set_xlabel("Latitude Index [#]")
+    ax.set_xlim(0, latDiff.size - 2)
+    ax.set_ylabel("Area [km²]")
+
+    # Configure figure ...
+    fg.tight_layout()
+
+    # Save figure ...
+    fg.savefig(pName2)
+    matplotlib.pyplot.close(fg)
+
+    # Optimize PNG ...
+    pyguymer3.image.optimise_image(
+        pName2,
+          debug = args.debug,
+           pool = None,
+          strip = True,
+        timeout = args.timeout,
+    )
 
     # **************************************************************************
 
@@ -314,12 +406,12 @@ if __name__ == "__main__":
     fg.tight_layout()
 
     # Save figure ...
-    fg.savefig(pName2)
+    fg.savefig(pName3)
     matplotlib.pyplot.close(fg)
 
     # Optimize PNG ...
     pyguymer3.image.optimise_image(
-        pName2,
+        pName3,
           debug = args.debug,
            pool = None,
           strip = True,
