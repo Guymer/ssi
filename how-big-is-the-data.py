@@ -123,7 +123,7 @@ if __name__ == "__main__":
     print("The axes are the same length as the data. This means that the longitude/latitude values are either:")
     print(" * The pixel centres *not* the pixel edges. The extent of the pixels can never be known.")
     print(" * The upper-left corners and it is left as an exercise to the reader to calculate the other three corners. The lower corners of the lowest row can never be known. The right corners of the rightmost column can never be known.")
-    print("Neither of these possibilities are good - or, the data is a lie, and it is not grid-wise data but it is actually point-wise data.")
+    print("Neither of these possibilities are good - or, the documentation is a lie, and it is not grid-wise data but it is actually point-wise data.")
     print(f"The latitude values extend from {lat[0]:.6f} ° to {lat[-1]:.6f} °.")
     print(f"The longitude values extend from {lon[0]:.6f} ° to {lon[-1]:.6f} °.")
 
