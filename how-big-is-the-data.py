@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
     # Create short-hands ...
     bName = f'{__file__.removesuffix(".py")}_areas_level={args.level:d}.bin'
-    nName = "ice_conc_baltic_202602021400.nc"
+    nName = sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc"))[0]
     pName1 = f'{__file__.removesuffix(".py")}_areas_level={args.level:d}.png'
     pName2 = f'{__file__.removesuffix(".py")}_areas.png'
     pName3 = f'{__file__.removesuffix(".py")}_points.png'
@@ -264,12 +264,13 @@ if __name__ == "__main__":
     )
     for iLat in range(lat.size - 1):
         tmpArr1D[iLat] = iLat
-        tmpArr2D[iLat, :] = iLat
+        tmpArr2D[iLat, :] = tmpArr1D[iLat]
 
     # Loop over generated binary files ...
     for bName in sorted(glob.glob(f'{__file__.removesuffix(".py")}_areas_level=?.bin')):
         # Create short-hands ...
         jName = f'{bName.removesuffix(".bin")}.json'
+        pName = f'{bName.removesuffix(".bin")}_diff.png'
         label = bName.removesuffix(".bin").split("_")[-1]
 
         # Load BIN file ...
@@ -294,7 +295,20 @@ if __name__ == "__main__":
             fObj.write(f"    {coef[2]:.15e}\n")
             fObj.write("]")
 
-        print(f"  {label} : {coef[0]:.3e} + {coef[1]:.3e} x + {coef[2]:.3e} x²")
+        print(f"  {label} : {coef[0]:.4e} + {coef[1]:.4e} x + {coef[2]:.4e} x²")
+
+        # Calculate what the pixel areas are using the polynomial degree 2 ...
+        areasPoly1D = numpy.zeros(
+            lat.size - 1,
+            dtype = numpy.float32,
+        )                                                                       # [km2]
+        areasPoly2D = numpy.zeros(
+            (lat.size - 1, lon.size - 1),
+            dtype = numpy.float32,
+        )                                                                       # [km2]
+        for iLat in range(lat.size - 1):
+            areasPoly1D[iLat] = coef[0] + coef[1] * tmpArr1D[iLat] + coef[2] * tmpArr1D[iLat] * tmpArr1D[iLat]  # [km2]
+            areasPoly2D[iLat, :] = areasPoly1D[iLat]                            # [km2]
 
         # Plot data ...
         ax.scatter(
@@ -305,7 +319,7 @@ if __name__ == "__main__":
         )
         ax.plot(
             tmpArr1D,
-            coef[0] + coef[1] * tmpArr1D + coef[2] * tmpArr1D * tmpArr1D,
+            areasPoly1D,
             label = f"{label} (fit)",
         )
 
