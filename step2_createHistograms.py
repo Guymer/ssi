@@ -6,6 +6,7 @@ if __name__ == "__main__":
     # Import standard modules ...
     import datetime
     import glob
+    import json
     import os
 
     # Import special modules ...
@@ -48,6 +49,28 @@ if __name__ == "__main__":
     if not os.path.exists("studyBalticConcentration/histograms"):
         os.mkdir("studyBalticConcentration/histograms")
 
+    # Load BIN files ...
+    lat = numpy.fromfile(
+        "studyBalticConcentration/lat.bin",
+        dtype = numpy.float32,
+    )                                                                           # [°]
+    lon = numpy.fromfile(
+        "studyBalticConcentration/lon.bin",
+        dtype = numpy.float32,
+    )                                                                           # [°]
+
+    # Load area coefficients ...
+    with open("studyBalticConcentration/areaCoef.json", "rt", encoding = "utf-8") as fObj:
+        coef = json.load(fObj)                                                  # [km2], [km2/°], [km2/°2]
+
+    # Calculate the area as a function of latitude ...
+    lat2area = numpy.zeros(
+        lat.size,
+        dtype = numpy.float64,
+    )                                                                           # [km2]
+    for iLat in range(lat.size):
+        lat2area[iLat] = coef[0] + coef[1] * lat[iLat] + coef[2] * lat[iLat] * lat[iLat]    # [km2]
+
     # **************************************************************************
 
     # Loop over NetCDF files ...
@@ -64,8 +87,8 @@ if __name__ == "__main__":
         try:
             # Open NetCDF file ...
             with scipy.io.netcdf_file(fname, mode = "r") as fObj:
-                # Extract the first layer from a copy of the dataset ...
-                lvl = fObj.variables["ice_concentration"].data.copy()[0, :, :].astype(numpy.int8)
+                # Extract the first layer ...
+                lvl = numpy.array(fObj.variables["ice_concentration"][0, :, :]).astype(numpy.int8)  # [%]
         except:
             print(" > Skipping, error loading NetCDF.")
             continue
@@ -82,21 +105,20 @@ if __name__ == "__main__":
 
             # Loop over concentrations ...
             for conc in range(101):
+                # Calculate the total area which has this concentration ...
+                totArea = 0.0                                                   # [km2]
+                for iLat in range(lat.size):
+                    totArea += lat2area[iLat] * (lvl[iLat, :] == conc).sum()    # [km2]
+
                 # Write data ...
-                # TODO: Interpolate the area of each pixel to this location. The
-                #       pixel area varies far more smoothly than the ice
-                #       concentration, therefore, it will introduce less
-                #       numerical error if the area is mapped to the
-                #       concentration rather than the concentration being mapped
-                #       to the area.
-                fObj.write(f"{conc:d},{(lvl == conc).sum():d}\n")
+                fObj.write(f"{conc:d},{totArea:.15e}\n")
 
     # **************************************************************************
 
     print("Summarising ...")
 
     # Initialize maxima ...
-    max1 = 0                                                                    # [km2]
+    max1 = 0.0                                                                  # [km2]
     max2 = 0.0                                                                  # [km2]
 
     # Loop over histograms ...
@@ -105,17 +127,17 @@ if __name__ == "__main__":
         x, y = numpy.loadtxt(
             hname,
             delimiter = ",",
-                dtype = numpy.int32,
+                dtype = numpy.float64,
              skiprows = 1,
                unpack = True,
-        )                                                                       # [km2], [km2]
+        )                                                                       # [%], [km2]
 
         # Update maxima ...
         max1 = max(max1, y[1:101].max())                                        # [km2]
         max2 = max(max2, 0.01 * numpy.dot(x[1:101], y[1:101]))                  # [km2]
 
     # Print summary ...
-    print(f"The highest single non-zero occurrence is {max1:,d} km².")
+    print(f"The highest single non-zero occurrence is {max1:,.1f} km².")
     print(f"The highest 100%-concentration equivalent occurrence is {max2:,.1f} km².")
 
     # **************************************************************************
@@ -159,16 +181,16 @@ if __name__ == "__main__":
                 x, y = numpy.loadtxt(
                     hnames[-1],
                     delimiter = ",",
-                        dtype = numpy.int32,
+                        dtype = numpy.float64,
                      skiprows = 1,
                        unpack = True,
-                )                                                               # [km2], [km2]
+                )                                                               # [%], [km2]
 
                 # Increment total ...
                 tots[key] += 0.01 * numpy.dot(x[1:101], y[1:101])               # [km2.day]
 
                 # Write data ...
-                fObj.write(f"{stub.isoformat()},{y[1:101].sum():d},{0.01 * numpy.dot(x[1:101], y[1:101]):e}\n")
+                fObj.write(f"{stub.isoformat()},{y[1:101].sum():.15e},{0.01 * numpy.dot(x[1:101], y[1:101]):.15e}\n")
 
             # Increment date stub ...
             stub = stub + datetime.timedelta(days = 1)
