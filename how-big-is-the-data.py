@@ -297,7 +297,7 @@ if __name__ == "__main__":
 
         print(f"  {label} : {coef[0]:.4e} + {coef[1]:.4e} x + {coef[2]:.4e} x²")
 
-        # Calculate what the pixel areas are using the polynomial degree 2 ...
+        # Calculate what the areas are using the polynomial degree 2 ...
         areasPoly1D = numpy.zeros(
             lat.size - 1,
             dtype = numpy.float32,
@@ -322,6 +322,44 @@ if __name__ == "__main__":
             areasPoly1D,
             label = f"{label} (fit)",
         )
+
+        # Calculate the percentage difference between the areas and the areas
+        # calculated using the polynomial degree 2 ...
+        diff = 100.0 * ((areas / areasPoly2D) - 1.0)                            # [%]
+
+        # Check if the PNG file needs making ...
+        if not os.path.exists(pName):
+            # Make a NumPy array suitable for saving as a PNG (from -0.2 % to
+            # +0.2 %) ...
+            tmpArr = 255.0 * (diff.astype(numpy.float64) + 0.2) / 0.4
+            numpy.place(tmpArr, tmpArr <   0.0,   0.0)
+            numpy.place(tmpArr, tmpArr > 255.0, 255.0)
+            tmpArr = tmpArr.astype(numpy.uint8)
+            tmpArr = tmpArr.reshape(lat.size - 1, lon.size - 1, 1)
+
+            # Save PNG ...
+            tmpSrc = pyguymer3.image.makePng(
+                tmpArr,
+                calcAdaptive = True,
+                 calcAverage = True,
+                    calcNone = True,
+                   calcPaeth = True,
+                     calcSub = True,
+                      calcUp = True,
+                     choices = "all",
+                       debug = args.debug,
+                         dpi = None,
+                      levels = [9,],
+                   memLevels = [9,],
+                     modTime = None,
+                    palUint8 = coolwarm,
+                  strategies = None,
+                      wbitss = [15,],
+            )
+            del tmpArr
+            with open(pName, "wb") as fObj:
+                fObj.write(tmpSrc)
+            del tmpSrc
 
     # Configure axis ...
     ax.grid()
