@@ -69,10 +69,11 @@ If you register for a free account at [Copernicus Marine Environment Monitoring 
 ## Workflow
 
 1. Download the entire [SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004](https://resources.marine.copernicus.eu/?option=com_csw&view=details&product_id=SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004) dataset (by running [lftp](https://lftp.yar.ru/) as outlined above)
-2. Create PNG maps of Baltic Sea sea ice concentration (by running [step1_createMaps.py](step1_createMaps.py))
-3. Create CSV histograms of Baltic Sea sea ice concentration (by running [step2_createHistograms.py](step2_createHistograms.py))
-4. Create PNG plots of Baltic Sea sea ice concentration (by running [step3_createPlots.py](step3_createPlots.py))
-5. Create PNG frames *and* MP4 video *and* WEBP animations of Baltic Sea sea ice concentration (by running [step4_createFrames.py](step4_createFrames.py))
+2. Check the data (by running [step0_checkData.py](step0_checkData.py))
+3. Create PNG maps of Baltic Sea sea ice concentration (by running [step1_createMaps.py](step1_createMaps.py))
+4. Create CSV histograms of Baltic Sea sea ice concentration (by running [step2_createHistograms.py](step2_createHistograms.py))
+5. Create PNG plots of Baltic Sea sea ice concentration (by running [step3_createPlots.py](step3_createPlots.py))
+6. Create PNG frames *and* MP4 video *and* WEBP animations of Baltic Sea sea ice concentration (by running [step4_createFrames.py](step4_createFrames.py))
 
 ## Output
 
@@ -80,8 +81,8 @@ The output of [step2_createHistograms.py](step2_createHistograms.py) is:
 
 ```
 Summarising ...
-The highest single non-zero occurrence is 84,569 km².
-The highest 100%-concentration equivalent occurrence is 166,898.7 km².
+The highest single non-zero occurrence is 370,188 km².
+The highest 100%-concentration equivalent occurrence is 373,708.2 km².
 Saving trends ...
 2018 = 9,334,863.9 km².day
 2019 = 6,020,943.4 km².day
@@ -89,6 +90,8 @@ Saving trends ...
 2021 = 6,345,430.9 km².day
 2022 = 7,316,733.1 km².day
 2023 = 6,213,928.5 km².day
+2024 = 9,797,486.6 km².day
+2025 = 3,879,237.5 km².day
 ```
 
 ## Dependencies
