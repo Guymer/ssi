@@ -291,29 +291,31 @@ if __name__ == "__main__":
 
     # **************************************************************************
 
-    # Create temporary array to hold the flattened latitudes ...
-    tmpArr = numpy.zeros(
-        (lat.size - 1, lon.size - 1),
-        dtype = numpy.float32,
-    )                                                                           # [°]
-    for iLat in range(lat.size - 1):
-        tmpArr[iLat, :] = 0.5 * (lat[iLat] + lat[iLat + 1])                     # [°]
+    # Check if the JSON file needs making ...
+    if not os.path.exists("studyBalticConcentration/areaCoef.json"):
+        print("Making \"studyBalticConcentration/areaCoef.json\" ...")
 
-    # Fit a polynomial degree 2 to the areas as a function of latitude ...
-    coef = numpy.polynomial.polynomial.Polynomial.fit(
-        tmpArr.flatten(),
-        areas.flatten(),
-        2,
-    ).convert().coef                                                            # [km2], [km2/°], [km2/°2]
-    del tmpArr
+        # Create temporary array to hold the flattened latitudes ...
+        tmpArr = numpy.zeros(
+            (lat.size - 1, lon.size - 1),
+            dtype = numpy.float32,
+        )                                                                       # [°]
+        for iLat in range(lat.size - 1):
+            tmpArr[iLat, :] = 0.5 * (lat[iLat] + lat[iLat + 1])                 # [°]
 
-    print("Making \"studyBalticConcentration/areaCoef.json\" ...")
+        # Fit a polynomial degree 2 to the areas as a function of latitude ...
+        coef = numpy.polynomial.polynomial.Polynomial.fit(
+            tmpArr.flatten(),
+            areas.flatten(),
+            2,
+        ).convert().coef                                                        # [km2], [km2/°], [km2/°2]
+        del tmpArr
 
-    # Save polynomial degree 2 as a JSON (manually, because I really want to
-    # specify the format/precision of the coefficients) ...
-    with open("studyBalticConcentration/areaCoef.json", "wt", encoding = "utf-8") as fObj:
-        fObj.write("[\n")
-        fObj.write(f"    {coef[0]:.15e},\n")
-        fObj.write(f"    {coef[1]:.15e},\n")
-        fObj.write(f"    {coef[2]:.15e}\n")
-        fObj.write("]")
+        # Save polynomial degree 2 as a JSON (manually, because I really want to
+        # specify the format/precision of the coefficients) ...
+        with open("studyBalticConcentration/areaCoef.json", "wt", encoding = "utf-8") as fObj:
+            fObj.write("[\n")
+            fObj.write(f"    {coef[0]:.15e},\n")
+            fObj.write(f"    {coef[1]:.15e},\n")
+            fObj.write(f"    {coef[2]:.15e}\n")
+            fObj.write("]")
