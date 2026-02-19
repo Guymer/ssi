@@ -87,9 +87,9 @@ if __name__ == "__main__":
         try:
             # Open NetCDF file ...
             with scipy.io.netcdf_file(fname, mode = "r") as fObj:
-                # Extract the first layer ...
+                # Extract the first time from the dataset ...
                 lvl = numpy.array(fObj.variables["ice_concentration"][0, :, :]).astype(numpy.int8)  # [%]
-        except:
+        except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
 

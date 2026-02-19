@@ -112,7 +112,7 @@ if __name__ == "__main__":
         # Load BIN file ...
         conc = numpy.fromfile(
             "studyBalticConcentration/conc.bin",
-            dtype = numpy.int16,
+            dtype = numpy.int8,
         ).reshape(1, lat.size, lon.size)                                        # [%]
 
     # Loop over NetCDF files ...
@@ -126,7 +126,7 @@ if __name__ == "__main__":
                 # Create short-hands ...
                 tmpLat = numpy.array(fObj.variables["lat"][:]).astype(numpy.float32)    # [°]
                 tmpLon = numpy.array(fObj.variables["lon"][:]).astype(numpy.float32)    # [°]
-                tmpConc = numpy.array(fObj.variables["ice_concentration"][:, :, :]).astype(numpy.int16) # [%]
+                tmpConc = numpy.array(fObj.variables["ice_concentration"][:, :, :]).astype(numpy.int8)  # [%]
         except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
@@ -161,7 +161,7 @@ if __name__ == "__main__":
             assert numpy.all(numpy.isclose(tmpLat, lat))
             assert numpy.all(numpy.isclose(tmpLon, lon))
 
-        # Check if there isn't any Baltic sea ice in this NetCDF file ...
+        # Check if there isn't any sea ice in this NetCDF file ...
         if tmpConc.max() <= 0:
             # Check if the short-hand has been populated ...
             if conc is None:

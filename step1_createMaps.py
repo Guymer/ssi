@@ -103,24 +103,24 @@ if __name__ == "__main__":
         try:
             # Open NetCDF file ...
             with scipy.io.netcdf_file(fname, mode = "r") as fObj:
-                # Extract the first layer from the dataset ...
-                lvl = fObj.variables["ice_concentration"].data[0, :, :].astype(numpy.float32)
-        except:
+                # Extract the first time from the dataset ...
+                lvl = numpy.array(fObj.variables["ice_concentration"][0, :, :]).astype(numpy.int8)  # [%]
+        except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
 
         # Skip if there isn't any sea ice ...
-        if lvl.max() <= 0.0:
+        if lvl.max() <= 0:
             print(" > Skipping, no sea ice.")
             continue
 
         # Find the pixels which are land ...
         # TODO: Survey the "isLand" pixels from each NetCDF and check that it
         #       never changes.
-        isLand = numpy.transpose(numpy.where(lvl < 0.0))
+        isLand = numpy.transpose(numpy.where(lvl < 0))
 
         # Scale data from 0 to 255, mapping it from 0 % to 100 % ...
-        lvl = 255.0 * (lvl / 100.0)
+        lvl = 255.0 * (lvl.astype(numpy.float32) / 100.0)
         numpy.place(lvl, lvl <   0.0,   0.0)
         numpy.place(lvl, lvl > 255.0, 255.0)
         lvl = lvl.astype(numpy.uint8)
