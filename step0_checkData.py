@@ -28,6 +28,7 @@ if __name__ == "__main__":
     try:
         import pyguymer3
         import pyguymer3.geo
+        import pyguymer3.image
     except:
         raise Exception("\"pyguymer3\" is not installed; run \"pip install --user PyGuymer3\"") from None
 
@@ -38,6 +39,11 @@ if __name__ == "__main__":
            allow_abbrev = False,
             description = "Check Baltic sea ice data.",
         formatter_class = argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "--debug",
+        action = "store_true",
+          help = "print debug messages",
     )
     parser.add_argument(
         "--eps",
@@ -75,6 +81,8 @@ if __name__ == "__main__":
         # Create short-hand ...
         lat = None
     else:
+        print("Loading \"studyBalticConcentration/lat.bin\" ...")
+
         # Load BIN file ...
         lat = numpy.fromfile(
             "studyBalticConcentration/lat.bin",
@@ -86,11 +94,26 @@ if __name__ == "__main__":
         # Create short-hand ...
         lon = None
     else:
+        print("Loading \"studyBalticConcentration/lon.bin\" ...")
+
         # Load BIN file ...
         lon = numpy.fromfile(
             "studyBalticConcentration/lon.bin",
             dtype = numpy.float32,
         )                                                                       # [°]
+
+    # Check if the BIN file needs making ...
+    if not os.path.exists("studyBalticConcentration/conc.bin"):
+        # Create short-hand ...
+        conc = None
+    else:
+        print("Loading \"studyBalticConcentration/conc.bin\" ...")
+
+        # Load BIN file ...
+        conc = numpy.fromfile(
+            "studyBalticConcentration/conc.bin",
+            dtype = numpy.int16,
+        ).reshape(1, lat.size, lon.size)                                        # [%]
 
     # Loop over NetCDF files ...
     for nName in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
@@ -103,34 +126,109 @@ if __name__ == "__main__":
                 # Create short-hands ...
                 tmpLat = numpy.array(fObj.variables["lat"][:]).astype(numpy.float32)    # [°]
                 tmpLon = numpy.array(fObj.variables["lon"][:]).astype(numpy.float32)    # [°]
-        except:
+                tmpConc = numpy.array(fObj.variables["ice_concentration"][:, :, :]).astype(numpy.int16) # [%]
+        except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
+
+        # Demonstrate how the data is arranged ...
+        assert len(tmpLat.shape) == 1
+        assert len(tmpLon.shape) == 1
+        assert len(tmpConc.shape) == 3
+        assert tmpConc.shape == (1, tmpLat.size, tmpLon.size)
 
         # Check if the short-hands have been populated ...
         if lat is None and lon is None:
             # Check if the BIN file needs making ...
             if not os.path.exists("studyBalticConcentration/lat.bin"):
+                print("Making \"studyBalticConcentration/lat.bin\" ...")
+
                 # Save BIN file ...
                 tmpLat.tofile("studyBalticConcentration/lat.bin")
 
             # Check if the BIN file needs making ...
             if not os.path.exists("studyBalticConcentration/lon.bin"):
+                print("Making \"studyBalticConcentration/lon.bin\" ...")
+
                 # Save BIN file ...
                 tmpLon.tofile("studyBalticConcentration/lon.bin")
 
             # Populate short-hands ...
             lat = copy.copy(tmpLat)                                             # [°]
             lon = copy.copy(tmpLon)                                             # [°]
+        else:
+            # Check values ...
+            assert numpy.all(numpy.isclose(tmpLat, lat))
+            assert numpy.all(numpy.isclose(tmpLon, lon))
 
-            # Skip to the next NetCDF ...
-            continue
+        # Check if there isn't any Baltic sea ice in this NetCDF file ...
+        if tmpConc.max() <= 0:
+            # Check if the short-hand has been populated ...
+            if conc is None:
+                # Check if the BIN file needs making ...
+                if not os.path.exists("studyBalticConcentration/conc.bin"):
+                    print("Making \"studyBalticConcentration/conc.bin\" ...")
 
-        # Check values ...
-        assert numpy.all(numpy.isclose(tmpLat, lat))
-        assert numpy.all(numpy.isclose(tmpLon, lon))
+                    # Save BIN file ...
+                    tmpConc.tofile("studyBalticConcentration/conc.bin")
 
-        break
+                # Check if the PNG file needs making ...
+                if not os.path.exists("studyBalticConcentration/conc.png"):
+                    print("Making \"studyBalticConcentration/conc.png\" ...")
+
+                    # Make an array suitable to be saved as a paletted PNG ...
+                    tmpArr = numpy.zeros(
+                        (tmpLat.size, tmpLon.size, 1),
+                        dtype = numpy.uint8,
+                    )
+                    for iLat in range(tmpLat.size):
+                        for iLon in range(tmpLon.size):
+                            match tmpConc[0, iLat, iLon]:
+                                case 0:                                         # water
+                                    tmpArr[iLat, iLon, 0] = 0                   # water
+                                case -99:                                       # land
+                                    tmpArr[iLat, iLon, 0] = 1                   # land
+                                case -59:                                       # out-of-scope water
+                                    tmpArr[iLat, iLon, 0] = 2                   # out-of-scope water
+                                case _:
+                                    raise ValueError(f"{tmpConc[0, iLat, iLon]:d} is not an expected value") from None
+
+                    # Save PNG file ...
+                    tmpSrc = pyguymer3.image.makePng(
+                        tmpArr,
+                        calcAdaptive = True,
+                         calcAverage = True,
+                            calcNone = True,
+                           calcPaeth = True,
+                             calcSub = True,
+                              calcUp = True,
+                             choices = "all",
+                               debug = args.debug,
+                                 dpi = None,
+                              levels = [9,],
+                           memLevels = [9,],
+                             modTime = None,
+                            palUint8 = numpy.array(
+                            [
+                                [  0,   0, 255],                                # blue
+                                [  0, 255,   0],                                # green
+                                [255,   0,   0],                                # red
+                            ],
+                            dtype = numpy.uint8,
+                        ),
+                          strategies = None,
+                              wbitss = [15,],
+                    )
+                    del tmpArr
+                    with open("studyBalticConcentration/conc.png", "wb") as fObj:
+                        fObj.write(tmpSrc)
+                    del tmpSrc
+
+                # Populate short-hand ...
+                conc = copy.copy(tmpConc)                                       # [%]
+            else:
+                # Check values ...
+                assert numpy.all(tmpConc == conc)
 
     # **************************************************************************
 
@@ -176,9 +274,13 @@ if __name__ == "__main__":
             print(f"  {progress:37s}", end = "\r")
         print()
 
+        print("Making \"studyBalticConcentration/areas.bin\" ...")
+
         # Save BIN file ...
         areas.tofile("studyBalticConcentration/areas.bin")
     else:
+        print("Loading \"studyBalticConcentration/areas.bin\" ...")
+
         # Load BIN file ...
         areas = numpy.fromfile(
             "studyBalticConcentration/areas.bin",
@@ -193,7 +295,7 @@ if __name__ == "__main__":
     tmpArr = numpy.zeros(
         (lat.size - 1, lon.size - 1),
         dtype = numpy.float32,
-    )
+    )                                                                           # [°]
     for iLat in range(lat.size - 1):
         tmpArr[iLat, :] = 0.5 * (lat[iLat] + lat[iLat + 1])                     # [°]
 
@@ -204,6 +306,8 @@ if __name__ == "__main__":
         2,
     ).convert().coef                                                            # [km2], [km2/°], [km2/°2]
     del tmpArr
+
+    print("Making \"studyBalticConcentration/areaCoef.json\" ...")
 
     # Save polynomial degree 2 as a JSON (manually, because I really want to
     # specify the format/precision of the coefficients) ...
