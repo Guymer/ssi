@@ -35,26 +35,31 @@ if __name__ == "__main__":
     # **************************************************************************
 
     # Loop over plots ...
-    for pname in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
+    for pName in sorted(glob.glob("studyBalticConcentration/plots/????-??-??.png")):
         # Extract date ...
-        date = os.path.basename(pname).removesuffix(".png")
+        date = os.path.basename(pName).removesuffix(".png")
 
         # Deduce frame name and skip if it already exists ...
-        fname = f"studyBalticConcentration/frames/{date}.png"
-        if os.path.exists(fname):
+        fName = f"studyBalticConcentration/frames/{date}.png"
+        if os.path.exists(fName):
             continue
 
-        print(f"Making \"{fname}\" ...")
+        print(f"Making \"{fName}\" ...")
 
         # Find maps ...
-        inames = sorted(glob.glob(f"studyBalticConcentration/maps/{date}_??-??.png"))
+        mNames = sorted(glob.glob(f"studyBalticConcentration/maps/{date}_??-??.png"))
+
+        # Skip this date if there isn't a map ...
+        if len(mNames) == 0:
+            print(" > Skipping, no map.")
+            continue
 
         # Open image as RGB (even if it is paletted) ...
-        with PIL.Image.open(inames[-1]) as iObj:
+        with PIL.Image.open(mNames[-1]) as iObj:
             im1 = iObj.convert("RGB")
 
         # Open image as RGB (even if it is paletted) ...
-        with PIL.Image.open(pname) as iObj:
+        with PIL.Image.open(pName) as iObj:
             im2 = iObj.convert("RGB")
 
         # Calculate width (ensuring that it is even) ...
@@ -76,8 +81,8 @@ if __name__ == "__main__":
         im0.paste(im2, (20 + im1.width, 10 + ((im0.height - 20) - im2.height) // 2))
 
         # Save frame ...
-        im0.save(fname)
-        pyguymer3.image.optimise_image(fname, strip = True)
+        im0.save(fName)
+        pyguymer3.image.optimise_image(fName, strip = True)
 
     # **************************************************************************
 
