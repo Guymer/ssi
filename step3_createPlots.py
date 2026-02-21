@@ -45,12 +45,6 @@ if __name__ == "__main__":
 
     # **************************************************************************
 
-    # Define month name abbreviations ...
-    months = {
-        "06" : "Jun",
-        "12" : "Dec",
-    }
-
     # Load trend CSV ...
     dates = []
     totals = []
@@ -61,46 +55,46 @@ if __name__ == "__main__":
         for line in fObj:
             if line.startswith("date,"):
                 continue
-            parts = line.strip().split(",")
-            dates.append(parts[0])
-            yyyy, mm, dd = parts[0].split("-")
-            if int(mm) % 6 == 0 and int(dd) == 1:
-                labels_loc.append(parts[0])
-                labels_txt.append(f"{months[mm]}/{yyyy[2:]}")
-            totals.append(0.001 * float(parts[1]))                              # [10^3 km2]
-            equivs.append(0.001 * float(parts[2]))                              # [10^3 km2]
+            yyyymmdd, total, equiv = line.strip().split(",")
+            dates.append(yyyymmdd)
+            yyyy, mm, dd = yyyymmdd.split("-")
+            if int(mm) == 7 and int(dd) == 1:
+                labels_loc.append(yyyymmdd)
+                labels_txt.append(yyyy)
+            totals.append(0.001 * float(total))                                 # [10^3 km2]
+            equivs.append(0.001 * float(equiv))                                 # [10^3 km2]
 
     # **************************************************************************
 
     # Loop over dates ...
     for date, total, equiv in zip(dates, totals, equivs, strict = True):
         # Deduce plot name and skip if it already exists ...
-        pname = f"studyBalticConcentration/plots/{date}.png"
-        if os.path.exists(pname):
+        pName = f"studyBalticConcentration/plots/{date}.png"
+        if os.path.exists(pName):
             continue
 
-        print(f"Making \"{pname}\" ...")
+        print(f"Making \"{pName}\" ...")
 
         # Find histograms and maps ...
-        hnames = sorted(glob.glob(f"studyBalticConcentration/histograms/{date}_??-??.csv"))
-        inames = sorted(glob.glob(f"studyBalticConcentration/maps/{date}_??-??.png"))
+        cNames = sorted(glob.glob(f"studyBalticConcentration/histograms/{date}_??-??.csv"))
+        pNames = sorted(glob.glob(f"studyBalticConcentration/maps/{date}_??-??.png"))
 
         # Skip this date if there isn't both a histogram and a map ...
-        if len(hnames) == 0 or len(inames) == 0:
+        if len(cNames) == 0 or len(pNames) == 0:
             print(" > Skipping, no histogram/map.")
             continue
 
         # Load most up-to-date histogram for the day ...
         x, y = numpy.loadtxt(
-            hnames[-1],
+            cNames[-1],
             delimiter = ",",
-                dtype = numpy.int32,
+                dtype = numpy.float64,
              skiprows = 1,
                unpack = True,
         )                                                                       # [%], [km2]
 
         # Convert to useful units ...
-        y = 0.001 * y.astype(numpy.float32)                                     # [10^3 km2]
+        y *= 0.001                                                              # [10^3 km2]
 
         # Create figure ...
         fg = matplotlib.pyplot.figure(figsize = (4.1, 4.9))
@@ -144,12 +138,24 @@ if __name__ == "__main__":
         ax[1].set_ylabel("Sea Ice Area [10³ km²]")
         ax[1].set_ylim(0, 85)
 
+        # Shade alternate years ...
+        for yyyy in range(int(dates[0].split("-")[0]), int(dates[-1].split("-")[0]) + 1, 2):
+            ax[0].axvspan(
+                f"{yyyy}-01-01",
+                f"{yyyy}-12-31",
+                    alpha = 0.25,
+                facecolor = "grey",
+            )
+
         # Configure figure ...
         fg.tight_layout()
 
         # Save figure ...
-        fg.savefig(pname)
+        fg.savefig(pName)
         matplotlib.pyplot.close(fg)
 
         # Optimize PNG ...
-        pyguymer3.image.optimise_image(pname, strip = True)
+        pyguymer3.image.optimise_image(
+            pName,
+            strip = True,
+        )
