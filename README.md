@@ -81,17 +81,17 @@ The output of [step2_createHistograms.py](step2_createHistograms.py) is:
 
 ```
 Summarising ...
-The highest single non-zero occurrence is 385,007.6 km².
-The highest 100%-concentration equivalent occurrence is 387,687.9 km².
+The highest single non-zero occurrence is 370,494.9 km².
+The highest 100%-concentration equivalent occurrence is 373,040.8 km².
 Saving trends ...
-2018 = 8,712,414.5 km².day
-2019 = 5,501,446.5 km².day
-2020 = 1,930,677.0 km².day
-2021 = 5,876,835.5 km².day
-2022 = 6,658,848.0 km².day
-2023 = 5,610,303.8 km².day
-2024 = 9,010,178.7 km².day
-2025 = 3,438,820.5 km².day
+2018 = 6,990,036.8 km².day
+2019 = 4,144,119.0 km².day
+2020 = 1,464,738.5 km².day
+2021 = 4,572,266.4 km².day
+2022 = 5,082,399.6 km².day
+2023 = 4,369,252.4 km².day
+2024 = 6,867,013.0 km².day
+2025 = 2,669,228.0 km².day
 ```
 
 ## Dependencies

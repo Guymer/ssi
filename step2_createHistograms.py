@@ -49,15 +49,31 @@ if __name__ == "__main__":
     if not os.path.exists("studyBalticConcentration/histograms"):
         os.mkdir("studyBalticConcentration/histograms")
 
-    # Load BIN files ...
-    lat = numpy.fromfile(
+    print("Loading \"studyBalticConcentration/lat.bin\" ...")
+
+    # Load BIN file ...
+    refLat = numpy.fromfile(
         "studyBalticConcentration/lat.bin",
         dtype = numpy.float32,
     )                                                                           # [°]
-    lon = numpy.fromfile(
+
+    print("Loading \"studyBalticConcentration/lon.bin\" ...")
+
+    # Load BIN file ...
+    refLon = numpy.fromfile(
         "studyBalticConcentration/lon.bin",
         dtype = numpy.float32,
     )                                                                           # [°]
+
+    print("Loading \"studyBalticConcentration/conc.bin\" ...")
+
+    # Load BIN file ...
+    refLvl = numpy.fromfile(
+        "studyBalticConcentration/conc.bin",
+        dtype = numpy.int8,
+    ).reshape(refLat.size, refLon.size)                                         # [%]
+
+    print("Loading \"studyBalticConcentration/areaCoef.json\" ...")
 
     # Load area coefficients ...
     with open("studyBalticConcentration/areaCoef.json", "rt", encoding = "utf-8") as fObj:
@@ -65,33 +81,37 @@ if __name__ == "__main__":
 
     # Calculate the area as a function of latitude ...
     lat2area = numpy.zeros(
-        lat.size,
+        refLat.size,
         dtype = numpy.float64,
     )                                                                           # [km2]
-    for iLat in range(lat.size):
-        lat2area[iLat] = coef[0] + coef[1] * lat[iLat] + coef[2] * lat[iLat] * lat[iLat]    # [km2]
+    for iLat in range(refLat.size):
+        lat2area[iLat] = coef[0] + coef[1] * refLat[iLat] + coef[2] * refLat[iLat] * refLat[iLat]   # [km2]
 
     # **************************************************************************
 
     # Loop over NetCDF files ...
-    for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
+    for nName in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
         # Deduce histogram name and skip if it already exists ...
-        stub = fname.split("_")[-1].removesuffix(".nc")
-        hname = f"studyBalticConcentration/histograms/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv"
-        if os.path.exists(hname):
+        stub = nName.split("_")[-1].removesuffix(".nc")
+        cName = f"studyBalticConcentration/histograms/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.csv"
+        if os.path.exists(cName):
             continue
 
-        print(f"Making \"{hname}\" ...")
+        print(f"Making \"{cName}\" ...")
 
         # Skip if there are errors ...
         try:
             # Open NetCDF file ...
-            with scipy.io.netcdf_file(fname, mode = "r") as fObj:
+            with scipy.io.netcdf_file(nName, mode = "r") as fObj:
                 # Extract the first time from the dataset ...
                 lvl = numpy.array(fObj.variables["ice_concentration"][0, :, :]).astype(numpy.int8)  # [%]
         except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
+
+        # Demonstrate how the data is arranged ...
+        assert len(lvl.shape) == 2
+        assert lvl.shape == (refLat.size, refLon.size)
 
         # Skip if there isn't any sea ice ...
         if lvl.max() <= 0:
@@ -99,7 +119,7 @@ if __name__ == "__main__":
             continue
 
         # Open CSV file ...
-        with open(hname, "wt", encoding = "utf-8") as fObj:
+        with open(cName, "wt", encoding = "utf-8") as fObj:
             # Write header ...
             fObj.write("sea ice concentration [%],area [km²]\n")
 
@@ -107,8 +127,18 @@ if __name__ == "__main__":
             for conc in range(101):
                 # Calculate the total area which has this concentration ...
                 totArea = 0.0                                                   # [km2]
-                for iLat in range(lat.size):
-                    totArea += lat2area[iLat] * (lvl[iLat, :] == conc).sum()    # [km2]
+                for iLat in range(refLat.size):
+                    for iLon in range(refLon.size):
+                        match refLvl[iLat, iLon]:
+                            case 0:                                             # water
+                                if lvl[iLat, iLon] == conc:                     # water
+                                    totArea += lat2area[iLat]                   # water
+                            case -99:                                           # land
+                                pass                                            # land
+                            case -59:                                           # out-of-scope water
+                                pass                                            # out-of-scope water
+                            case _:
+                                raise ValueError(f"{refLvl[iLat, iLon]:d} is not an expected value") from None
 
                 # Write data ...
                 fObj.write(f"{conc:d},{totArea:.15e}\n")
@@ -122,10 +152,10 @@ if __name__ == "__main__":
     max2 = 0.0                                                                  # [km2]
 
     # Loop over histograms ...
-    for hname in sorted(glob.glob("studyBalticConcentration/histograms/????-??-??_??-??.csv")):
+    for cName in sorted(glob.glob("studyBalticConcentration/histograms/????-??-??_??-??.csv")):
         # Load histogram ...
         x, y = numpy.loadtxt(
-            hname,
+            cName,
             delimiter = ",",
                 dtype = numpy.float64,
              skiprows = 1,
@@ -170,16 +200,16 @@ if __name__ == "__main__":
                 tots[key] = 0.0                                                 # [km2.day]
 
             # Find histograms ...
-            hnames = sorted(glob.glob(f"studyBalticConcentration/histograms/{stub.isoformat()}_??-??.csv"))
+            cNames = sorted(glob.glob(f"studyBalticConcentration/histograms/{stub.isoformat()}_??-??.csv"))
 
             # Check what to do ...
-            if len(hnames) == 0:
+            if len(cNames) == 0:
                 # Write data ...
                 fObj.write(f"{stub.isoformat()},{0:d},{0.0:e}\n")
             else:
                 # Load most up-to-date histogram for the day ...
                 x, y = numpy.loadtxt(
-                    hnames[-1],
+                    cNames[-1],
                     delimiter = ",",
                         dtype = numpy.float64,
                      skiprows = 1,

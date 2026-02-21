@@ -87,37 +87,60 @@ if __name__ == "__main__":
     if not os.path.exists("studyBalticConcentration/maps"):
         os.mkdir("studyBalticConcentration/maps")
 
+    print("Loading \"studyBalticConcentration/lat.bin\" ...")
+
+    # Load BIN file ...
+    refLat = numpy.fromfile(
+        "studyBalticConcentration/lat.bin",
+        dtype = numpy.float32,
+    )                                                                           # [°]
+
+    print("Loading \"studyBalticConcentration/lon.bin\" ...")
+
+    # Load BIN file ...
+    refLon = numpy.fromfile(
+        "studyBalticConcentration/lon.bin",
+        dtype = numpy.float32,
+    )                                                                           # [°]
+
+    print("Loading \"studyBalticConcentration/conc.bin\" ...")
+
+    # Load BIN file ...
+    refLvl = numpy.fromfile(
+        "studyBalticConcentration/conc.bin",
+        dtype = numpy.int8,
+    ).reshape(refLat.size, refLon.size)                                         # [%]
+
     # **************************************************************************
 
     # Loop over NetCDF files ...
-    for fname in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
+    for nName in sorted(glob.glob("Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/FMI-BAL-SEAICE_CONC-L4-NRT-OBS/????/??/ice_conc_baltic_????????????.nc")):
         # Deduce image name and skip if it already exists ...
-        stub = fname.split("_")[-1].removesuffix(".nc")
-        iname = f"studyBalticConcentration/maps/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.png"
-        if os.path.exists(iname):
+        stub = nName.split("_")[-1].removesuffix(".nc")
+        pName = f"studyBalticConcentration/maps/{stub[0:4]}-{stub[4:6]}-{stub[6:8]}_{stub[8:10]}-{stub[10:12]}.png"
+        if os.path.exists(pName):
             continue
 
-        print(f"Making \"{iname}\" ...")
+        print(f"Making \"{pName}\" ...")
 
         # Skip if there are errors ...
         try:
             # Open NetCDF file ...
-            with scipy.io.netcdf_file(fname, mode = "r") as fObj:
+            with scipy.io.netcdf_file(nName, mode = "r") as fObj:
                 # Extract the first time from the dataset ...
                 lvl = numpy.array(fObj.variables["ice_concentration"][0, :, :]).astype(numpy.int8)  # [%]
         except ValueError:
             print(" > Skipping, error loading NetCDF.")
             continue
 
+        # Demonstrate how the data is arranged ...
+        assert len(lvl.shape) == 2
+        assert lvl.shape == (refLat.size, refLon.size)
+
         # Skip if there isn't any sea ice ...
         if lvl.max() <= 0:
             print(" > Skipping, no sea ice.")
             continue
-
-        # Find the pixels which are land ...
-        # TODO: Survey the "isLand" pixels from each NetCDF and check that it
-        #       never changes.
-        isLand = numpy.transpose(numpy.where(lvl < 0))
 
         # Scale data from 0 to 255, mapping it from 0 % to 100 % ...
         lvl = 255.0 * (lvl.astype(numpy.float32) / 100.0)
@@ -128,20 +151,26 @@ if __name__ == "__main__":
         # Make image ...
         # NOTE: If I just wanted to make an image of the Baltic sea ice then I
         #       could skip this step and just make a paletted image. However, as
-        #       I also want to use the colour white (for land) and the colour
-        #       black (for overlaid text) then there would be more than 256
-        #       colours in the palette. Therefore, it must be an RGB image.
+        #       I also want to use the colour white (for land), the colour grey
+        #       (for out-of-scope water) and the colour black (for overlaid
+        #       text) then there would be more than 256 colours in the palette.
+        #       Therefore, it must be an RGB image.
         img = numpy.zeros(
-            (lvl.shape[0], lvl.shape[1], 3),
+            (refLat.size, refLon.size, 3),
             dtype = numpy.uint8,
         )
-        for iy in range(lvl.shape[0]):
-            for ix in range(lvl.shape[1]):
-                img[iy, ix, :] = turbo[lvl[iy, ix], :]
+        for iLat in range(refLat.size):
+            for iLon in range(refLon.size):
+                match refLvl[iLat, iLon]:
+                    case 0:                                                     # water
+                        img[iLat, iLon, :] = turbo[lvl[iLat, iLon], :]          # water
+                    case -99:                                                   # land
+                        img[iLat, iLon, :] = 255                                # land
+                    case -59:                                                   # out-of-scope water
+                        img[iLat, iLon, :] = 191                                # out-of-scope water
+                    case _:
+                        raise ValueError(f"{refLvl[iLat, iLon]:d} is not an expected value") from None
         del lvl
-        for i in range(isLand.shape[0]):
-            img[isLand[i, 0], isLand[i, 1], :] = 255
-        del isLand
 
         # Declare overlays ...
         overlays = [
@@ -182,6 +211,6 @@ if __name__ == "__main__":
               strategies = None,
                   wbitss = [15,],
         )
-        with open(iname, "wb") as fObj:
+        with open(pName, "wb") as fObj:
             fObj.write(src)
         del img
