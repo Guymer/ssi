@@ -82,7 +82,10 @@ if __name__ == "__main__":
 
         # Save frame ...
         im0.save(fName)
-        pyguymer3.image.optimise_image(fName, strip = True)
+        pyguymer3.image.optimise_image(
+            fName,
+            strip = True,
+        )
 
     # **************************************************************************
 
@@ -101,16 +104,6 @@ if __name__ == "__main__":
 
     # **************************************************************************
 
-    print("Making \"studyBalticConcentration/trends.webp\" ...")
-
-    # Save 25fps WEBP ...
-    pyguymer3.media.images2webp(
-        frames,
-        "studyBalticConcentration/trends.webp",
-    )
-
-    # **************************************************************************
-
     # Set maximum sizes ...
     # NOTE: By inspection, the PNG frames are 2,484 px wide.
     maxSizes = [256, 512, 1024, 2048]                                           # [px]
@@ -126,15 +119,3 @@ if __name__ == "__main__":
             screenHeight = maxSize,
         )
         shutil.move(vname, f"studyBalticConcentration/trends{maxSize:04d}px.mp4")
-
-        # **********************************************************************
-
-        print(f"Making \"studyBalticConcentration/trends{maxSize:04d}px.webp\" ...")
-
-        # Save 25fps WEBP ...
-        pyguymer3.media.images2webp(
-            frames,
-            f"studyBalticConcentration/trends{maxSize:04d}px.webp",
-             screenWidth = maxSize,
-            screenHeight = maxSize,
-        )
