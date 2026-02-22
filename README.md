@@ -13,7 +13,7 @@ The following three sea ice datasets from the [Copernicus Marine Environment Mon
     * The [User Manual](https://documentation.marine.copernicus.eu/PUM/CMEMS-SEAICE-PUM-011-004-011.pdf) states that: "Geographical coverage = Baltic Sea 9°E 🡪 30°30’E ; 53°40’N 🡪 66°N" and "Horizontal resolution = 1km". This statement **does not** agree with the values in the NetCDF.
     * The [User Manual](https://documentation.marine.copernicus.eu/PUM/CMEMS-SEAICE-PUM-011-004-011.pdf) states that: "The nominal resolution is about 1km". This statement **does not** agree with the values in the NetCDF (unless "about" means "to within 20% of").
     * The [User Manual](https://documentation.marine.copernicus.eu/PUM/CMEMS-SEAICE-PUM-011-004-011.pdf) states that the NetCDF schema is:
-    ```
+```
 dimensions:
     time = 1 ;
     xc = 3812 ;
@@ -62,7 +62,7 @@ variables:
         concentration_range:grid_mapping = "crs" ;
         concentration_range:_FillValue = -99s ;
         concentration_range:comments = "Range of the analyzed ice concentration value" ;
-    ```
+```
 
 If you register for a free account at [Copernicus Marine Environment Monitoring Service](https://marine.copernicus.eu/) you can then put your account information in a file called "~/.netrc" using the format `machine nrt.cmems-du.eu login USERNAME password PASSWORD`. Then, after installing [lftp](https://lftp.yar.ru/), you can download datasets with a command along the lines of `lftp -c "open --user USERNAME ftp://nrt.cmems-du.eu; mirror -ep Core/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/ Copernicus/SEAICE_BAL_SEAICE_L4_NRT_OBSERVATIONS_011_004/"`. This command can be repeated later to just update your local mirror with new files.
 
@@ -73,7 +73,7 @@ If you register for a free account at [Copernicus Marine Environment Monitoring 
 3. Create PNG maps of Baltic Sea sea ice concentration (by running [step1_createMaps.py](step1_createMaps.py))
 4. Create CSV histograms of Baltic Sea sea ice concentration (by running [step2_createHistograms.py](step2_createHistograms.py))
 5. Create PNG plots of Baltic Sea sea ice concentration (by running [step3_createPlots.py](step3_createPlots.py))
-6. Create PNG frames *and* MP4 video *and* WEBP animations of Baltic Sea sea ice concentration (by running [step4_createFrames.py](step4_createFrames.py))
+6. Create PNG frames *and* MP4 videos of Baltic Sea sea ice concentration (by running [step4_createFrames.py](step4_createFrames.py))
 
 ## Output
 
