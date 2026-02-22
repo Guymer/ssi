@@ -134,7 +134,7 @@ if __name__ == "__main__":
         # Configure axis ...
         ax[1].grid()
         ax[1].set_xlabel("Concentration [%]")
-        ax[1].set_xlim(0, 100)
+        ax[1].set_xlim(-0.5, 100.5)
         ax[1].set_ylabel("Sea Ice Area [10³ km²]")
         ax[1].set_ylim(0, 85)
 
