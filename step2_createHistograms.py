@@ -260,17 +260,7 @@ if __name__ == "__main__":
     )
 
     # Fit a straight line to the data ...
-    assert x.size == y.size
-    n = x.size
-    xbar = x.sum() / n
-    ybar = y.sum() / n
-    top = 0.0
-    bot = 0.0
-    for i in range(n):
-        top += (x[i] - xbar) * y[i]
-        bot += pow(x[i] - xbar, 2)
-    m = top / bot
-    c = ybar - m * xbar
+    m, c = pyguymer3.linearRegression(x, y)
 
     # Plot data ...
     ax.plot(
