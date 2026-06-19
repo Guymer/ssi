@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Use the proper idiom in the main module ...
-# NOTE: See https://docs.python.org/3.12/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
+# NOTE: See https://docs.python.org/3.13/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
     import glob
@@ -53,7 +53,7 @@ if __name__ == "__main__":
     equivs = []
     labels_loc = []
     labels_txt = []
-    with open("studyBalticConcentration/trends.csv", "rt", encoding = "utf-8") as fObj:
+    with open("studyBalticConcentration/trends.csv", mode = "rt", encoding = "utf-8") as fObj:
         for line in fObj:
             if line.startswith("date,"):
                 continue

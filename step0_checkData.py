@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Use the proper idiom in the main module ...
-# NOTE: See https://docs.python.org/3.12/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
+# NOTE: See https://docs.python.org/3.13/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
     import argparse
@@ -220,7 +220,7 @@ if __name__ == "__main__":
                               wbitss = [15,],
                     )
                     del tmpArr
-                    with open("studyBalticConcentration/conc.png", "wb") as fObj:
+                    with open("studyBalticConcentration/conc.png", mode = "wb") as fObj:
                         fObj.write(tmpSrc)
                     del tmpSrc
 
@@ -313,7 +313,7 @@ if __name__ == "__main__":
 
         # Save polynomial degree 2 as a JSON (manually, because I really want to
         # specify the format/precision of the coefficients) ...
-        with open("studyBalticConcentration/areaCoef.json", "wt", encoding = "utf-8") as fObj:
+        with open("studyBalticConcentration/areaCoef.json", mode = "wt", encoding = "utf-8") as fObj:
             fObj.write("[\n")
             fObj.write(f"    {coef[0]:.15e},\n")
             fObj.write(f"    {coef[1]:.15e},\n")

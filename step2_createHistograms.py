@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Use the proper idiom in the main module ...
-# NOTE: See https://docs.python.org/3.12/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
+# NOTE: See https://docs.python.org/3.13/library/multiprocessing.html#the-spawn-and-forkserver-start-methods
 if __name__ == "__main__":
     # Import standard modules ...
     import datetime
@@ -78,7 +78,7 @@ if __name__ == "__main__":
     print("Loading \"studyBalticConcentration/areaCoef.json\" ...")
 
     # Load area coefficients ...
-    with open("studyBalticConcentration/areaCoef.json", "rt", encoding = "utf-8") as fObj:
+    with open("studyBalticConcentration/areaCoef.json", mode = "rt", encoding = "utf-8") as fObj:
         coef = json.load(fObj)                                                  # [km2], [km2/°], [km2/°2]
 
     # Calculate the area as a function of latitude ...
@@ -121,7 +121,7 @@ if __name__ == "__main__":
             continue
 
         # Open CSV file ...
-        with open(cName, "wt", encoding = "utf-8") as fObj:
+        with open(cName, mode = "wt", encoding = "utf-8") as fObj:
             # Write header ...
             fObj.write("sea ice concentration [%],area [km²]\n")
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     tots = {}
 
     # Open CSV file ...
-    with open("studyBalticConcentration/trends.csv", "wt", encoding = "utf-8") as fObj:
+    with open("studyBalticConcentration/trends.csv", mode = "wt", encoding = "utf-8") as fObj:
         # Write header ...
         fObj.write("date,total sea ice area [km²],100%-concentration equivalent sea ice area [km²]\n")
 
