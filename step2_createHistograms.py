@@ -233,6 +233,10 @@ if __name__ == "__main__":
 
     # Loop over years ...
     for year in sorted(tots.keys()):
+        # Skip empty years ...
+        if tots[year] <= 0.0:
+            continue
+
         # Append values to lists ...
         x.append(year)
         y.append(tots[year])                                                    # [km2.day]
