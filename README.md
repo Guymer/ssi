@@ -92,6 +92,7 @@ Saving trends ...
 2023 = 4,369,252.4 km².day
 2024 = 6,867,013.0 km².day
 2025 = 2,669,228.0 km².day
+2026 = 6,344,515.5 km².day
 ```
 
 ## Dependencies
