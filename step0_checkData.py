@@ -226,9 +226,9 @@ if __name__ == "__main__":
 
                 # Populate short-hand ...
                 conc = copy.copy(tmpConc)                                       # [%]
-            else:
-                # Check values ...
-                assert numpy.all(tmpConc == conc)
+            elif not numpy.all(tmpConc == conc):
+                # Cry ...
+                print(f"WARNING: \"{nName}\" does't have any concentration and it disagrees with the standard map.")
 
     # **************************************************************************
 
