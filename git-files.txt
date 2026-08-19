@@ -7,6 +7,7 @@
 .shellcheckrc
 git-files.txt
 LICENCE.txt
+makeAlphabet.png
 makeAlphabet.py
 README.md
 requirements.txt
