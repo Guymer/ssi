@@ -1,6 +1,6 @@
 # Study Sea Ice (SSI)
 
-!["mypy" GitHub Action Status](https://github.com/Guymer/ssi/actions/workflows/mypy.yaml/badge.svg) !["pylint" GitHub Action Status](https://github.com/Guymer/ssi/actions/workflows/pylint.yaml/badge.svg)
+!["mypy" GitHub Action Status](https://github.com/Guymer/ssi/actions/workflows/mypy.yaml/badge.svg)
 
 This project aims to map the behaviour of sea ice.
 
